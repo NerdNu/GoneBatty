@@ -1,0 +1,19 @@
+name: ${project.name}
+version: ${project.version}
+author: totemo
+authors: [totemo]
+description: ${project.description}
+website: ${project.url}
+main: io.totemo.gonebatty.GoneBatty
+
+permissions:
+  gonebatty.admin:
+    description: Permission to administer the plugin.
+    default: op
+
+commands:
+  gonebatty:
+    description: ${project.name} administrative command.
+    permission: gonebatty.admin
+    usage: |
+      /<command> reload: Reload the configuration.

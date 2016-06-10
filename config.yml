@@ -1,0 +1,116 @@
+debug:
+  config: true
+  chance: false
+  drops: true
+  allow_spawn_eggs: false
+
+looting_base: 1.3
+
+world:
+  # Per-world drop chance multiplier (all drops); compensates for the end grinder.
+  factor:
+    testing: 1.0
+    world: 1.0
+    world_nether: 1.0
+    world_the_end: 0.01
+
+drops:
+  head:
+    enabled: true
+    chance: 0.005
+
+    # Mob type specific factor multiplied by the base head drop chance.
+    # If the mob is not listed, then the factor defaults to 1.0.
+    # Note, however, that spawner mobs don't do special drops.
+    # For the purposes of this config, we're setting the drop rate of anything
+    # that can be relatively easily farmed (i.e. animals, slimes, villagers and
+    # guardians) at 1/10th that of hostile mobs.
+    scale:
+      CHICKEN: 0.1
+      COW: 0.1
+      GUARDIAN: 0.1
+      GOLEM: 0.1
+      HORSE: 0.1
+      MUSHROOM_COW: 0.1
+      OCELOT: 0.1
+      PIG: 0.1
+      RABBIT: 0.1
+      SHEEP: 0.1
+      SLIME: 0.1
+      SNOW_GOLEM: 0.1
+      SQUID: 1.0
+      VILLAGER: 0.1
+      # Wither skeletons drop their heads naturally.
+      WITHER_SKELETON: 0.0
+      WOLF: 0.1
+
+    # Skull owners for head drops, or missing for no skull.
+    # texture data instead of the owner, in a later version.
+    # Any mob that doesn't have an entry won't drop a skull,
+    # e.g. WITHER_SKELETON.
+    owner:
+      BLAZE: MHF_Blaze
+      CAVE_SPIDER: MHF_CaveSpider
+      CHICKEN: MHF_Chicken
+      COW: MHF_Cow
+      ENDERMAN: MHF_Enderman
+      ENDERMITE: MHF_Endermite
+      GHAST: MHF_Ghast
+      GOLEM: MHF_Golem
+      GUARDIAN: MHF_Guardian
+      # HORSE: doesn't exist
+      MAGMA_CUBE: MHF_LavaSlime
+      MUSHROOM_COW: MHF_MushroomCow
+      OCELOT: MHF_Ocelot
+      PIG: MHF_Pig
+      PIG_ZOMBIE: MHF_PigZombie
+      RABBIT: MHF_Rabbit
+      SHEEP: MHF_Sheep
+      SHULKER: MHF_Shulker
+      # SILVERFISH: shows as a pumpkin :(
+      SLIME: MHF_Slime
+      SNOW_GOLEM: MHF_SnowGolem
+      SPIDER: MHF_Spider
+      SQUID: MHF_Squid
+      VILLAGER: MHF_Villager
+      WITHER: MHF_Wither
+      WOLF: MHF_Wolf
+
+  essence_of_flight:
+    enabled: true
+    chance: 0.002
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      type: GHAST_TEAR
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        display-name: §6Essence of Flight
+        lore:
+        - §9Trade along with a Dragon Head for an Elytra!
+        enchants:
+          ARROW_KNOCKBACK: 10
+
+    # Mob type specific factor multiplied by the base EoF drop chance.
+    # If the mob is not listed, then the factor defaults to 0.0.
+    # Note, however, that spawner mobs don't do special drops.
+    scale:
+      BAT: 10.0
+      BLAZE: 10.0
+      CAVE_SPIDER: 1.0
+      CREEPER: 2.0
+      ENDER_DRAGON: 20000.0
+      ENDERMAN: 1.0
+      ENDERMITE: 3.0
+      GHAST: 10.0
+      GUARDIAN: 0.01
+      MAGMA_CUBE: 0.5
+      PIG_ZOMBIE: 0.5
+      SILVERFISH: 3.0
+      SLIME: 0.1
+      SHULKER: 2.0
+      SKELETON: 0.5
+      SPIDER: 1.0
+      WITCH: 5.0
+      WITHER: 10.0
+      ZOMBIE: 0.5
