@@ -86,12 +86,16 @@ public class GoneBatty extends JavaPlugin implements Listener {
     /**
      * On creature spawn, tag natural spawns with a metadata value indicating
      * that they *are* naturally spawned.
+     *
+     * Also tag CUSTOM spawns the same way, so that mobs spawned by ItsATrap and
+     * other plugins are eligible to drop heads and Essence of Flight.
      */
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.getSpawnReason() == SpawnReason.NATURAL ||
             event.getSpawnReason() == SpawnReason.BREEDING ||
             event.getSpawnReason() == SpawnReason.EGG ||
+            event.getSpawnReason() == SpawnReason.CUSTOM ||
             (CONFIG.DEBUG_ALLOW_SPAWN_EGGS && event.getSpawnReason() == SpawnReason.SPAWNER_EGG)) {
             event.getEntity().setMetadata(NATURAL_KEY, new FixedMetadataValue(this, Boolean.TRUE));
         }
