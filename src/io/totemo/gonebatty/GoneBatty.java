@@ -95,7 +95,13 @@ public class GoneBatty extends JavaPlugin implements Listener {
         if (event.getSpawnReason() == SpawnReason.NATURAL ||
             event.getSpawnReason() == SpawnReason.BREEDING ||
             event.getSpawnReason() == SpawnReason.EGG ||
+            event.getSpawnReason() == SpawnReason.SLIME_SPLIT ||
+            event.getSpawnReason() == SpawnReason.SILVERFISH_BLOCK ||
             event.getSpawnReason() == SpawnReason.CUSTOM ||
+            event.getSpawnReason() == SpawnReason.MOUNT ||
+            event.getSpawnReason() == SpawnReason.JOCKEY ||
+            event.getSpawnReason() == SpawnReason.LIGHTNING ||
+            event.getSpawnReason() == SpawnReason.TRAP ||
             (CONFIG.DEBUG_ALLOW_SPAWN_EGGS && event.getSpawnReason() == SpawnReason.SPAWNER_EGG)) {
             event.getEntity().setMetadata(NATURAL_KEY, new FixedMetadataValue(this, Boolean.TRUE));
         }
