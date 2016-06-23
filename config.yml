@@ -31,12 +31,13 @@ drops:
       GUARDIAN: 0.1
       GOLEM: 0.1
       HORSE: 0.1
+      MAGMA_CUBE: 1.0
       MUSHROOM_COW: 0.1
       OCELOT: 0.1
       PIG: 0.1
       RABBIT: 0.1
       SHEEP: 0.1
-      SLIME: 0.1
+      SLIME: 1.0
       SNOW_GOLEM: 0.1
       SQUID: 1.0
       VILLAGER: 0.1
@@ -104,10 +105,10 @@ drops:
       ENDERMITE: 3.0
       GHAST: 10.0
       GUARDIAN: 0.01
-      MAGMA_CUBE: 0.5
+      MAGMA_CUBE: 2.0
       PIG_ZOMBIE: 0.5
       SILVERFISH: 3.0
-      SLIME: 0.1
+      SLIME: 0.5
       SHULKER: 2.0
       SKELETON: 0.5
       SPIDER: 1.0
