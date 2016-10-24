@@ -34,7 +34,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * The current features are:
  * <ul>
- * <li>Overworld mobs drop "Essence of Flight" (named, enchanted ghast tear).</li>
+ * <li>Overworld mobs drop "Essence of Flight" (named, enchanted ghast tear).
+ * </li>
  * <li>Mobs have a chance to drop their heads.</li>
  * </ul>
  */
@@ -282,9 +283,8 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 if (_random.nextDouble() < eofChance) {
                     world.dropItemNaturally(loc, CONFIG.ESSENCE_OF_FLIGHT);
                     if (CONFIG.DEBUG_DROPS) {
-                        getLogger().info(playerName + " killed " + entity.getType().name() +
-                                         " which dropped Essence of Flight at " +
-                                         Util.formatLocation(loc));
+                        getLogger().info(playerName + " killed " + CONFIG.getCreatureTypeString(entity) +
+                                         " which dropped Essence of Flight at " + Util.formatLocation(loc));
                     }
                 }
             }
@@ -299,11 +299,12 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 }
 
                 if (_random.nextDouble() < headChance) {
-                    ItemStack head = CONFIG.HEAD_ITEMS.get(CONFIG.getCreatureTypeString(entity));
+                    String type = CONFIG.getCreatureTypeString(entity);
+                    ItemStack head = CONFIG.HEAD_ITEMS.get(type);
                     if (head != null) {
                         world.dropItemNaturally(loc, head);
                         if (CONFIG.DEBUG_DROPS) {
-                            getLogger().info(playerName + " killed " + entity.getType().name() +
+                            getLogger().info(playerName + " killed " + type +
                                              " which dropped mob head at " + Util.formatLocation(loc));
                         }
                     }

@@ -11,7 +11,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Skeleton.SkeletonType;
+import org.bukkit.entity.Villager.Profession;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -217,12 +218,25 @@ public class Configuration {
      *
      * @return the creature type identifier string.
      */
+    @SuppressWarnings("deprecation")
     public String getCreatureTypeString(Entity creature) {
         if (creature.getType() == EntityType.SKELETON) {
             Skeleton skeleton = (Skeleton) creature;
-            return (skeleton.getSkeletonType() == SkeletonType.WITHER) ? "WITHER_SKELETON" : "SKELETON";
+            switch (skeleton.getSkeletonType()) {
+            case WITHER:
+                return "WITHER_SKELETON";
+            case STRAY:
+                return "STRAY";
+            case NORMAL:
+            default:
+                return "SKELETON";
+            }
+        } else if (creature.getType() == EntityType.ZOMBIE) {
+            Zombie zombie = (Zombie) creature;
+            return (zombie.getVillagerProfession() == Profession.HUSK) ? "HUSK" : "ZOMBIE";
+        } else {
+            return creature.getType().name();
         }
-        return creature.getType().name();
     }
 
     // ------------------------------------------------------------------------

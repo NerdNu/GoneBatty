@@ -26,24 +26,25 @@ drops:
     # that can be relatively easily farmed (i.e. animals, slimes, villagers and
     # guardians) at 1/10th that of hostile mobs.
     scale:
-      CHICKEN: 0.1
-      COW: 0.1
+      CHICKEN: 0.2
+      COW: 0.2
       GUARDIAN: 0.1
-      GOLEM: 0.1
-      HORSE: 0.1
-      MAGMA_CUBE: 1.0
-      MUSHROOM_COW: 0.1
-      OCELOT: 0.1
-      PIG: 0.1
-      RABBIT: 0.1
-      SHEEP: 0.1
-      SLIME: 1.0
-      SNOW_GOLEM: 0.1
+      GOLEM: 0.2
+      HORSE: 0.2
+      MAGMA_CUBE: 3.0
+      MUSHROOM_COW: 0.2
+      OCELOT: 0.2
+      PIG: 0.2
+      POLAR_BEAR: 5.0
+      RABBIT: 0.2
+      SHEEP: 0.2
+      SLIME: 3.0
+      SNOW_GOLEM: 0.2
       SQUID: 1.0
-      VILLAGER: 0.1
+      VILLAGER: 0.2
       # Wither skeletons drop their heads naturally.
       WITHER_SKELETON: 0.0
-      WOLF: 0.1
+      WOLF: 0.2
 
     # Skull owners for head drops, or missing for no skull.
     # texture data instead of the owner, in a later version.
@@ -60,11 +61,13 @@ drops:
       GOLEM: MHF_Golem
       GUARDIAN: MHF_Guardian
       # HORSE: doesn't exist
+      # HUSK: MHF_Husk doesn't look like a husk
       MAGMA_CUBE: MHF_LavaSlime
       MUSHROOM_COW: MHF_MushroomCow
       OCELOT: MHF_Ocelot
       PIG: MHF_Pig
       PIG_ZOMBIE: MHF_PigZombie
+      POLAR_BEAR: MHF_PolarBear
       RABBIT: MHF_Rabbit
       SHEEP: MHF_Sheep
       SHULKER: MHF_Shulker
@@ -72,14 +75,16 @@ drops:
       SLIME: MHF_Slime
       SNOW_GOLEM: MHF_SnowGolem
       SPIDER: MHF_Spider
+      STRAY: MHF_Stray
       SQUID: MHF_Squid
       VILLAGER: MHF_Villager
+      WITCH: MHF_Witch
       WITHER: MHF_Wither
       WOLF: MHF_Wolf
 
   essence_of_flight:
     enabled: true
-    chance: 0.002
+    chance: 0.001
     item:
       ==: org.bukkit.inventory.ItemStack
       type: GHAST_TEAR
@@ -105,6 +110,7 @@ drops:
       ENDERMITE: 3.0
       GHAST: 10.0
       GUARDIAN: 0.01
+      HUSK: 0.5
       MAGMA_CUBE: 2.0
       PIG_ZOMBIE: 0.5
       SILVERFISH: 3.0
@@ -112,6 +118,7 @@ drops:
       SHULKER: 2.0
       SKELETON: 0.5
       SPIDER: 1.0
+      STRAY: 0.5
       WITCH: 5.0
       WITHER: 10.0
       ZOMBIE: 0.5
