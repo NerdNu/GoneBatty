@@ -104,7 +104,7 @@ public class Configuration {
      * Scaling factor applied to the looting-adjusted essence of flight drop
      * chance according to how flight-capable a mob is.
      */
-    public HashMap<EntityType, Double> EOF_MOB_FACTOR = new HashMap<EntityType, Double>();
+    public HashMap<String, Double> EOF_MOB_FACTOR = new HashMap<String, Double>();
 
     // ------------------------------------------------------------------------
     /**
@@ -131,12 +131,8 @@ public class Configuration {
         ConfigurationSection headMobFactor = GoneBatty.PLUGIN.getConfig().getConfigurationSection("drops.head.scale");
         HEAD_MOB_FACTOR.clear();
         for (String mobType : headMobFactor.getKeys(false)) {
-            try {
-                Double factor = headMobFactor.getDouble(mobType);
-                HEAD_MOB_FACTOR.put(mobType, factor);
-            } catch (IllegalArgumentException ex) {
-                GoneBatty.PLUGIN.getLogger().warning("Invalid mob type for flight factor: " + mobType);
-            }
+            Double factor = headMobFactor.getDouble(mobType);
+            HEAD_MOB_FACTOR.put(mobType, factor);
         }
 
         HEAD_ITEMS.clear();
@@ -160,13 +156,8 @@ public class Configuration {
         ConfigurationSection mobFlightFactor = GoneBatty.PLUGIN.getConfig().getConfigurationSection("drops.essence_of_flight.scale");
         EOF_MOB_FACTOR.clear();
         for (String mobType : mobFlightFactor.getKeys(false)) {
-            try {
-                Double factor = mobFlightFactor.getDouble(mobType);
-                EntityType type = EntityType.valueOf(mobType);
-                EOF_MOB_FACTOR.put(type, factor);
-            } catch (IllegalArgumentException ex) {
-                GoneBatty.PLUGIN.getLogger().warning("Invalid mob type for flight factor: " + mobType);
-            }
+            Double factor = mobFlightFactor.getDouble(mobType);
+            EOF_MOB_FACTOR.put(mobType, factor);
         }
 
         if (DEBUG_CONFIG) {
@@ -203,8 +194,8 @@ public class Configuration {
             GoneBatty.PLUGIN.getLogger().info("ESSENCE_OF_FLIGHT: " + ESSENCE_OF_FLIGHT);
             GoneBatty.PLUGIN.getLogger().info("ESSENCE_OF_FLIGHT_CHANCE: " + ESSENCE_OF_FLIGHT_CHANCE);
             GoneBatty.PLUGIN.getLogger().info("Mob EoF drop factors:");
-            for (Entry<EntityType, Double> entry : EOF_MOB_FACTOR.entrySet()) {
-                GoneBatty.PLUGIN.getLogger().info(entry.getKey().name() + ": " + entry.getValue());
+            for (Entry<String, Double> entry : EOF_MOB_FACTOR.entrySet()) {
+                GoneBatty.PLUGIN.getLogger().info(entry.getKey() + ": " + entry.getValue());
             }
         }
     } // reload
@@ -277,7 +268,7 @@ public class Configuration {
      *         chance.
      */
     public double getEssenceOfFlightDropScale(Entity entity) {
-        Double factor = EOF_MOB_FACTOR.get(entity.getType());
+        Double factor = EOF_MOB_FACTOR.get(getCreatureTypeString(entity));
         return (factor != null) ? factor : 0.0;
     }
 
