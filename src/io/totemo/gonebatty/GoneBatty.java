@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -186,9 +187,10 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * @return true if the specified entity is eligible for custom drops.
      */
     protected boolean isEligibleMob(Entity entity) {
-        return isNaturalSpawn(entity) &&
-               entity instanceof LivingEntity &&
-               entity.getType() != EntityType.ARMOR_STAND;
+        return entity instanceof EnderDragon ||
+               (isNaturalSpawn(entity) &&
+                entity instanceof LivingEntity &&
+                entity.getType() != EntityType.ARMOR_STAND);
     }
 
     // ------------------------------------------------------------------------

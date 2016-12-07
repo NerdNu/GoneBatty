@@ -28,6 +28,7 @@ drops:
     scale:
       CHICKEN: 0.2
       COW: 0.2
+      ENDER_DRAGON: 20001.0
       GUARDIAN: 0.1
       GOLEM: 0.2
       HORSE: 0.2
@@ -93,7 +94,7 @@ drops:
         meta-type: UNSPECIFIC
         display-name: §6Essence of Flight
         lore:
-        - §9Trade along with a Dragon Head for an Elytra!
+        - §9Craft along with a Dragon Head for an Elytra!
         enchants:
           ARROW_KNOCKBACK: 10
 
@@ -105,7 +106,7 @@ drops:
       BLAZE: 10.0
       CAVE_SPIDER: 1.0
       CREEPER: 2.0
-      ENDER_DRAGON: 20000.0
+      ENDER_DRAGON: 50000.0
       ENDERMAN: 1.0
       ENDERMITE: 3.0
       GHAST: 10.0
