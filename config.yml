@@ -30,7 +30,7 @@ drops:
       COW: 0.2
       ENDER_DRAGON: 20001.0
       GUARDIAN: 0.1
-      GOLEM: 0.2
+      IRON_GOLEM: 0.2
       HORSE: 0.2
       MAGMA_CUBE: 3.0
       MUSHROOM_COW: 0.2
@@ -40,7 +40,7 @@ drops:
       RABBIT: 0.2
       SHEEP: 0.2
       SLIME: 3.0
-      SNOW_GOLEM: 0.2
+      SNOWMAN: 0.2
       SQUID: 1.0
       VILLAGER: 0.2
       # Wither skeletons drop their heads naturally.
@@ -59,7 +59,7 @@ drops:
       ENDERMAN: MHF_Enderman
       ENDERMITE: MHF_Endermite
       GHAST: MHF_Ghast
-      GOLEM: MHF_Golem
+      IRON_GOLEM: MHF_Golem
       GUARDIAN: MHF_Guardian
       # HORSE: doesn't exist
       # HUSK: MHF_Husk doesn't look like a husk
@@ -74,7 +74,7 @@ drops:
       SHULKER: MHF_Shulker
       # SILVERFISH: shows as a pumpkin :(
       SLIME: MHF_Slime
-      SNOW_GOLEM: MHF_SnowGolem
+      SNOWMAN: MHF_SnowGolem
       SPIDER: MHF_Spider
       STRAY: MHF_Stray
       SQUID: MHF_Squid
