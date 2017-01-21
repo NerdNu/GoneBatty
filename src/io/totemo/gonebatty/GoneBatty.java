@@ -95,16 +95,19 @@ public class GoneBatty extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         if (event.getSpawnReason() == SpawnReason.NATURAL ||
+            event.getSpawnReason() == SpawnReason.DEFAULT ||
+            event.getSpawnReason() == SpawnReason.CUSTOM ||
             event.getSpawnReason() == SpawnReason.BREEDING ||
+            event.getSpawnReason() == SpawnReason.REINFORCEMENTS ||
             event.getSpawnReason() == SpawnReason.EGG ||
             event.getSpawnReason() == SpawnReason.SILVERFISH_BLOCK ||
-            event.getSpawnReason() == SpawnReason.CUSTOM ||
             event.getSpawnReason() == SpawnReason.MOUNT ||
             event.getSpawnReason() == SpawnReason.JOCKEY ||
             event.getSpawnReason() == SpawnReason.LIGHTNING ||
             event.getSpawnReason() == SpawnReason.TRAP ||
             event.getSpawnReason() == SpawnReason.BUILD_IRONGOLEM ||
             event.getSpawnReason() == SpawnReason.BUILD_SNOWMAN ||
+            event.getSpawnReason() == SpawnReason.CHUNK_GEN ||
             (CONFIG.DEBUG_ALLOW_SPAWN_EGGS && event.getSpawnReason() == SpawnReason.SPAWNER_EGG)) {
             event.getEntity().setMetadata(NATURAL_KEY, new FixedMetadataValue(this, Boolean.TRUE));
         }

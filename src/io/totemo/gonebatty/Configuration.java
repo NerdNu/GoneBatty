@@ -9,10 +9,6 @@ import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Villager.Profession;
-import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -205,29 +201,14 @@ public class Configuration {
      * Get a unique string identifier for the creature type that takes into
      * account variants.
      *
-     * In most cases this is just the upper case name of the EntityType enum.
+     * In 1.10, this method was non-trivial, but as of 1.11, all of the mob
+     * variants that the plugin distinguishes have their own EntityType
+     * constant.
      *
      * @return the creature type identifier string.
      */
-    @SuppressWarnings("deprecation")
     public String getCreatureTypeString(Entity creature) {
-        if (creature.getType() == EntityType.SKELETON) {
-            Skeleton skeleton = (Skeleton) creature;
-            switch (skeleton.getSkeletonType()) {
-            case WITHER:
-                return "WITHER_SKELETON";
-            case STRAY:
-                return "STRAY";
-            case NORMAL:
-            default:
-                return "SKELETON";
-            }
-        } else if (creature.getType() == EntityType.ZOMBIE) {
-            Zombie zombie = (Zombie) creature;
-            return (zombie.getVillagerProfession() == Profession.HUSK) ? "HUSK" : "ZOMBIE";
-        } else {
-            return creature.getType().name();
-        }
+        return creature.getType().name();
     }
 
     // ------------------------------------------------------------------------
@@ -271,5 +252,4 @@ public class Configuration {
         Double factor = EOF_MOB_FACTOR.get(getCreatureTypeString(entity));
         return (factor != null) ? factor : 0.0;
     }
-
 } // class Configuration

@@ -58,6 +58,7 @@ drops:
       COW: MHF_Cow
       ENDERMAN: MHF_Enderman
       ENDERMITE: MHF_Endermite
+      EVOKER: MHF_Evoker
       GHAST: MHF_Ghast
       IRON_GOLEM: MHF_Golem
       GUARDIAN: MHF_Guardian
@@ -78,7 +79,9 @@ drops:
       SPIDER: MHF_Spider
       STRAY: MHF_Stray
       SQUID: MHF_Squid
+      VEX: MHF_Vex
       VILLAGER: MHF_Villager
+      VINDICATOR: MHF_Illager
       WITCH: MHF_Witch
       WITHER: MHF_Wither
       WOLF: MHF_Wolf
@@ -120,6 +123,7 @@ drops:
       SKELETON: 0.5
       SPIDER: 1.0
       STRAY: 0.5
+      VEX: 2.0
       WITCH: 5.0
       WITHER: 10.0
       ZOMBIE: 0.5
