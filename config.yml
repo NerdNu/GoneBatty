@@ -3,6 +3,7 @@ debug:
   chance: false
   drops: true
   allow_spawn_eggs: false
+  events: true
 
 looting_base: 1.3
 

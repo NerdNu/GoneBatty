@@ -3,14 +3,18 @@ package io.totemo.gonebatty;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 
 // ----------------------------------------------------------------------------
 /**
@@ -37,6 +41,11 @@ public class Configuration {
      * testing and debugging).
      */
     public boolean DEBUG_ALLOW_SPAWN_EGGS;
+
+    /**
+     * If true, do debug logging of entity damage and death events.
+     */
+    public boolean DEBUG_EVENTS;
 
     /**
      * The exponential base for the drop chance multiplies calculation when the
@@ -107,24 +116,29 @@ public class Configuration {
      * Load the plugin configuration.
      */
     public void reload() {
-        GoneBatty.PLUGIN.reloadConfig();
+        Plugin plugin = GoneBatty.PLUGIN;
+        FileConfiguration config = plugin.getConfig();
+        Logger logger = plugin.getLogger();
 
-        DEBUG_CONFIG = GoneBatty.PLUGIN.getConfig().getBoolean("debug.config");
-        DEBUG_CHANCE = GoneBatty.PLUGIN.getConfig().getBoolean("debug.chance");
-        DEBUG_DROPS = GoneBatty.PLUGIN.getConfig().getBoolean("debug.drops");
-        DEBUG_ALLOW_SPAWN_EGGS = GoneBatty.PLUGIN.getConfig().getBoolean("debug.allow_spawn_eggs");
+        plugin.reloadConfig();
 
-        LOOTING_BASE = GoneBatty.PLUGIN.getConfig().getDouble("looting_base");
+        DEBUG_CONFIG = config.getBoolean("debug.config");
+        DEBUG_CHANCE = config.getBoolean("debug.chance");
+        DEBUG_DROPS = config.getBoolean("debug.drops");
+        DEBUG_ALLOW_SPAWN_EGGS = config.getBoolean("debug.allow_spawn_eggs");
+        DEBUG_EVENTS = config.getBoolean("debug.events");
 
-        ConfigurationSection worlds = GoneBatty.PLUGIN.getConfig().getConfigurationSection("world.factor");
+        LOOTING_BASE = config.getDouble("looting_base");
+
+        ConfigurationSection worlds = config.getConfigurationSection("world.factor");
         WORLD_FACTOR.clear();
         for (String world : worlds.getKeys(false)) {
             WORLD_FACTOR.put(world, worlds.getDouble(world));
         }
 
-        HEAD_ENABLED = GoneBatty.PLUGIN.getConfig().getBoolean("drops.head.enabled");
-        HEAD_CHANCE = GoneBatty.PLUGIN.getConfig().getDouble("drops.head.chance");
-        ConfigurationSection headMobFactor = GoneBatty.PLUGIN.getConfig().getConfigurationSection("drops.head.scale");
+        HEAD_ENABLED = config.getBoolean("drops.head.enabled");
+        HEAD_CHANCE = config.getDouble("drops.head.chance");
+        ConfigurationSection headMobFactor = config.getConfigurationSection("drops.head.scale");
         HEAD_MOB_FACTOR.clear();
         for (String mobType : headMobFactor.getKeys(false)) {
             Double factor = headMobFactor.getDouble(mobType);
@@ -132,24 +146,26 @@ public class Configuration {
         }
 
         HEAD_ITEMS.clear();
-        HEAD_ITEMS.put("SKELETON", new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.SKELETON.ordinal()));
-        HEAD_ITEMS.put("WITHER_SKELETON", new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.WITHER.ordinal()));
-        HEAD_ITEMS.put("ZOMBIE", new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.ZOMBIE.ordinal()));
-        HEAD_ITEMS.put("CREEPER", new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.CREEPER.ordinal()));
-        HEAD_ITEMS.put("ENDER_DRAGON", new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.DRAGON.ordinal()));
-        ConfigurationSection headOwners = GoneBatty.PLUGIN.getConfig().getConfigurationSection("drops.head.owner");
+        HEAD_ITEMS.put("SKELETON", new ItemStack(Material.SKELETON_SKULL));
+        HEAD_ITEMS.put("WITHER_SKELETON", new ItemStack(Material.WITHER_SKELETON_SKULL));
+        HEAD_ITEMS.put("ZOMBIE", new ItemStack(Material.ZOMBIE_HEAD));
+        HEAD_ITEMS.put("CREEPER", new ItemStack(Material.CREEPER_HEAD));
+        HEAD_ITEMS.put("ENDER_DRAGON", new ItemStack(Material.DRAGON_HEAD));
+        ConfigurationSection headOwners = config.getConfigurationSection("drops.head.owner");
         for (String mobType : headOwners.getKeys(false)) {
-            ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
-            meta.setOwner(headOwners.getString(mobType));
+            @SuppressWarnings("deprecation")
+            OfflinePlayer owner = Bukkit.getOfflinePlayer(headOwners.getString(mobType));
+            meta.setOwningPlayer(owner);
             head.setItemMeta(meta);
             HEAD_ITEMS.put(mobType, head);
         }
 
-        ESSENCE_OF_FLIGHT_ENABLED = GoneBatty.PLUGIN.getConfig().getBoolean("drops.essence_of_flight.enabled");
-        ESSENCE_OF_FLIGHT_CHANCE = GoneBatty.PLUGIN.getConfig().getDouble("drops.essence_of_flight.chance");
-        ESSENCE_OF_FLIGHT = GoneBatty.PLUGIN.getConfig().getItemStack("drops.essence_of_flight.item");
-        ConfigurationSection mobFlightFactor = GoneBatty.PLUGIN.getConfig().getConfigurationSection("drops.essence_of_flight.scale");
+        ESSENCE_OF_FLIGHT_ENABLED = config.getBoolean("drops.essence_of_flight.enabled");
+        ESSENCE_OF_FLIGHT_CHANCE = config.getDouble("drops.essence_of_flight.chance");
+        ESSENCE_OF_FLIGHT = config.getItemStack("drops.essence_of_flight.item");
+        ConfigurationSection mobFlightFactor = config.getConfigurationSection("drops.essence_of_flight.scale");
         EOF_MOB_FACTOR.clear();
         for (String mobType : mobFlightFactor.getKeys(false)) {
             Double factor = mobFlightFactor.getDouble(mobType);
@@ -157,41 +173,49 @@ public class Configuration {
         }
 
         if (DEBUG_CONFIG) {
-            GoneBatty.PLUGIN.getLogger().info("DEBUG_CONFIG: " + DEBUG_CONFIG);
-            GoneBatty.PLUGIN.getLogger().info("LOOTING_BASE: " + LOOTING_BASE);
-            GoneBatty.PLUGIN.getLogger().info("World drop factors:");
+            logger.info("DEBUG_ALLOW_SPAWN_EGGS: " + DEBUG_ALLOW_SPAWN_EGGS);
+            logger.info("DEBUG_CHANCE: " + DEBUG_CHANCE);
+            logger.info("DEBUG_DROPS: " + DEBUG_DROPS);
+            logger.info("DEBUG_EVENTS: " + DEBUG_EVENTS);
+
+            logger.info("LOOTING_BASE: " + LOOTING_BASE);
+            logger.info("World drop factors:");
             for (Entry<String, Double> entry : WORLD_FACTOR.entrySet()) {
-                GoneBatty.PLUGIN.getLogger().info(entry.getKey() + ": " + entry.getValue());
+                logger.info(entry.getKey() + ": " + entry.getValue());
             }
 
-            GoneBatty.PLUGIN.getLogger().info("HEAD_CHANCE: " + HEAD_CHANCE);
+            logger.info("HEAD_CHANCE: " + HEAD_CHANCE);
 
             // Combine the mob type keys for head drop factors and head item.
             // Then show the combined information for both.
             HashSet<String> mobTypes = new HashSet<String>(HEAD_MOB_FACTOR.keySet());
             mobTypes.addAll(HEAD_ITEMS.keySet());
-            GoneBatty.PLUGIN.getLogger().info("Mob head drop factors and items:");
+            logger.info("Mob head drop factors and items:");
             for (String mobType : mobTypes) {
                 Double factor = HEAD_MOB_FACTOR.get(mobType);
                 if (factor == null) {
                     factor = 1.0;
                 }
-                ItemStack head = HEAD_ITEMS.get(mobType);
-                String owner;
-                if (head != null) {
-                    SkullMeta meta = (SkullMeta) head.getItemMeta();
-                    owner = (meta.getOwner() != null) ? meta.getOwner() : "HEAD_ITEM:" + head.getDurability();
+                ItemStack headItem = HEAD_ITEMS.get(mobType);
+                String head;
+                if (headItem != null) {
+                    if (headItem.getType() == Material.PLAYER_HEAD) {
+                        SkullMeta meta = (SkullMeta) headItem.getItemMeta();
+                        head = (meta.getOwningPlayer() != null) ? meta.getOwningPlayer().getName() : headItem.getType().name();
+                    } else {
+                        head = headItem.getType().name();
+                    }
                 } else {
-                    owner = "none";
+                    head = "none";
                 }
-                GoneBatty.PLUGIN.getLogger().info(mobType + ": " + factor + " " + owner);
+                logger.info(mobType + ": " + factor + " " + head);
             }
 
-            GoneBatty.PLUGIN.getLogger().info("ESSENCE_OF_FLIGHT: " + ESSENCE_OF_FLIGHT);
-            GoneBatty.PLUGIN.getLogger().info("ESSENCE_OF_FLIGHT_CHANCE: " + ESSENCE_OF_FLIGHT_CHANCE);
-            GoneBatty.PLUGIN.getLogger().info("Mob EoF drop factors:");
+            logger.info("ESSENCE_OF_FLIGHT: " + ESSENCE_OF_FLIGHT);
+            logger.info("ESSENCE_OF_FLIGHT_CHANCE: " + ESSENCE_OF_FLIGHT_CHANCE);
+            logger.info("Mob EoF drop factors:");
             for (Entry<String, Double> entry : EOF_MOB_FACTOR.entrySet()) {
-                GoneBatty.PLUGIN.getLogger().info(entry.getKey() + ": " + entry.getValue());
+                logger.info(entry.getKey() + ": " + entry.getValue());
             }
         }
     } // reload
