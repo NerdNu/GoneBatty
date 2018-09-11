@@ -3,6 +3,7 @@ package io.totemo.gonebatty;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -145,13 +146,11 @@ public class GoneBatty extends JavaPlugin implements Listener {
         } else {
             if (canBeDecapitatedByPlayer(victim)) {
                 String playerName = "";
-                int lootingLevel = 0;
                 boolean isPlayerAttack = false;
                 if (event.getDamager() instanceof Player) {
                     isPlayerAttack = true;
                     Player player = (Player) event.getDamager();
                     playerName = player.getName();
-                    lootingLevel = player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
                 } else if (event.getDamager() instanceof Projectile) {
                     Projectile projectile = (Projectile) event.getDamager();
                     if (projectile.getShooter() instanceof Player) {
@@ -164,7 +163,6 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 if (isPlayerAttack) {
                     victim.setMetadata(PLAYER_NAME_KEY, new FixedMetadataValue(this, playerName));
                     victim.setMetadata(PLAYER_DAMAGE_TIME_KEY, new FixedMetadataValue(this, new Long(victim.getWorld().getFullTime())));
-                    victim.setMetadata(PLAYER_LOOTING_LEVEL_KEY, new FixedMetadataValue(this, lootingLevel));
                 }
             }
         }
@@ -185,11 +183,17 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 getLogger().info("onEntityDeath: " + entity.getType() + " " + Util.shortUuid(entity));
             }
 
-            int lootingLevel = getLootingLevelMeta(entity);
             Long damageTime = getPlayerDamageTime(entity);
             if (damageTime != null) {
                 Location loc = entity.getLocation();
                 if (loc.getWorld().getFullTime() - damageTime < PLAYER_DAMAGE_TICKS) {
+                    // Calculate looting based on what the killing player is
+                    // holding in his main hand at the time the entity dies.
+                    Player player = Bukkit.getPlayerExact(getPlayerNameMeta(entity));
+                    if (player == null) {
+                        return;
+                    }
+                    int lootingLevel = player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
                     doCustomDrops(event.getEntity(), lootingLevel);
                 }
             }
@@ -280,22 +284,6 @@ public class GoneBatty extends JavaPlugin implements Listener {
             }
         }
         return null;
-    }
-
-    // ------------------------------------------------------------------------
-    /**
-     * Return the looting level metadata value from a mob.
-     *
-     * This metadata is added when a player damages a mob. It is the level of
-     * the Looting enchant on the weapon that did the damage, or 0 if there was
-     * no such enchant.
-     *
-     * @param entity the damaged entity.
-     * @return the level of the Looting enchant, or 0 if not so enchanted.
-     */
-    protected int getLootingLevelMeta(Entity entity) {
-        List<MetadataValue> lootingLevel = entity.getMetadata(PLAYER_LOOTING_LEVEL_KEY);
-        return (lootingLevel.size() > 0) ? lootingLevel.get(0).asInt() : 0;
     }
 
     // ------------------------------------------------------------------------
@@ -525,12 +513,6 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * (Long) by a player.
      */
     protected static final String PLAYER_DAMAGE_TIME_KEY = PLUGIN_NAME + "_PlayerDamageTime";
-
-    /**
-     * Metadata name used for metadata stored on mobs to record looting
-     * enchantment level of Looting weapon used by a player.
-     */
-    protected static final String PLAYER_LOOTING_LEVEL_KEY = PLUGIN_NAME + "_PlayerLootingLevel";
 
     /**
      * Time in ticks (1/20ths of a second) for which player attack damage
