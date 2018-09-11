@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -76,6 +77,16 @@ public class Util {
      */
     public static double random(double min, double max) {
         return min + _random.nextDouble() * (max - min);
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Return the first 6 characters of an Entity's UUID as a string.
+     * 
+     * @return the first 6 characters of an Entity's UUID as a string.
+     */
+    public static String shortUuid(Entity entity) {
+        return entity.getUniqueId().toString().substring(0, 6);
     }
 
     // ------------------------------------------------------------------------

@@ -5,11 +5,12 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -21,9 +22,12 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 // ----------------------------------------------------------------------------
@@ -86,30 +90,16 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
     // ------------------------------------------------------------------------
     /**
-     * On creature spawn, tag natural spawns with a metadata value indicating
-     * that they *are* naturally spawned.
+     * On creature spawn, tag spawner spawns with persistent metadata indicating
+     * that they came from a spawner.
      *
-     * Also tag CUSTOM spawns the same way, so that mobs spawned by ItsATrap and
-     * other plugins are eligible to drop heads and Essence of Flight.
+     * GoneBatty does not allow spawner mobs to drop heads when killed by
+     * players, although they do drop heads when killed by charged creepers.
      */
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason() == SpawnReason.NATURAL ||
-            event.getSpawnReason() == SpawnReason.DEFAULT ||
-            event.getSpawnReason() == SpawnReason.CUSTOM ||
-            event.getSpawnReason() == SpawnReason.BREEDING ||
-            event.getSpawnReason() == SpawnReason.REINFORCEMENTS ||
-            event.getSpawnReason() == SpawnReason.EGG ||
-            event.getSpawnReason() == SpawnReason.SILVERFISH_BLOCK ||
-            event.getSpawnReason() == SpawnReason.MOUNT ||
-            event.getSpawnReason() == SpawnReason.JOCKEY ||
-            event.getSpawnReason() == SpawnReason.LIGHTNING ||
-            event.getSpawnReason() == SpawnReason.TRAP ||
-            event.getSpawnReason() == SpawnReason.BUILD_IRONGOLEM ||
-            event.getSpawnReason() == SpawnReason.BUILD_SNOWMAN ||
-            event.getSpawnReason() == SpawnReason.CHUNK_GEN ||
-            (CONFIG.DEBUG_ALLOW_SPAWN_EGGS && event.getSpawnReason() == SpawnReason.SPAWNER_EGG)) {
-            event.getEntity().setMetadata(NATURAL_KEY, new FixedMetadataValue(this, Boolean.TRUE));
+        if (event.getSpawnReason() == SpawnReason.SPAWNER) {
+            // TODO: EntityMeta integration
         }
     }
 
@@ -121,29 +111,62 @@ public class GoneBatty extends JavaPlugin implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        Entity entity = event.getEntity();
-        String playerName = "";
-        if (isEligibleMob(entity)) {
-            int lootingLevel = 0;
-            boolean isPlayerAttack = false;
-            if (event.getDamager() instanceof Player) {
-                isPlayerAttack = true;
-                Player player = (Player) event.getDamager();
-                playerName = player.getName();
-                lootingLevel = player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
-            } else if (event.getDamager() instanceof Projectile) {
-                Projectile projectile = (Projectile) event.getDamager();
-                if (projectile.getShooter() instanceof Player) {
-                    playerName = ((Player) projectile.getShooter()).getName();
-                    isPlayerAttack = true;
+        Entity victim = event.getEntity();
+        if (!(victim instanceof LivingEntity)) {
+            return;
+        }
+        LivingEntity living = (LivingEntity) victim;
+        double finalHealth = (living.getHealth() - event.getFinalDamage());
+        Entity damager = event.getDamager();
+
+        if (CONFIG.DEBUG_EVENTS) {
+            getLogger().info("onEntityDamageByEntity: " + victim.getType() + " " + Util.shortUuid(victim) +
+                             " final health " + finalHealth +
+                             " by " + damager.getType() + " " + Util.shortUuid(damager));
+        }
+
+        if (damager instanceof Creeper) {
+            // Update ChargedCreeperExplosion meta when player/mob *killed* by
+            // creeper.
+            Creeper creeper = (Creeper) damager;
+            if (finalHealth <= 0 && creeper.isPowered() && canBeDecapitatedByChargedCreeper(victim)) {
+                ChargedCreeperExplosion meta = getChargedCreeperExplosion(creeper, true);
+                if (canDropVanillaHead(victim)) {
+                    if (CONFIG.DEBUG_EVENTS) {
+                        getLogger().info("Vanilla decapitation expected.");
+                    }
+                    meta.vanillaHeadDropped = true;
+                } else if (meta.firstVictim == null) {
+                    meta.firstVictim = victim;
+                    if (CONFIG.DEBUG_EVENTS) {
+                        getLogger().info("Staging non-vanilla decapitation: " + victim.getType() + " " + Util.shortUuid(victim));
+                    }
                 }
             }
+        } else {
+            if (canBeDecapitatedByPlayer(victim)) {
+                String playerName = "";
+                int lootingLevel = 0;
+                boolean isPlayerAttack = false;
+                if (event.getDamager() instanceof Player) {
+                    isPlayerAttack = true;
+                    Player player = (Player) event.getDamager();
+                    playerName = player.getName();
+                    lootingLevel = player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
+                } else if (event.getDamager() instanceof Projectile) {
+                    Projectile projectile = (Projectile) event.getDamager();
+                    if (projectile.getShooter() instanceof Player) {
+                        playerName = ((Player) projectile.getShooter()).getName();
+                        isPlayerAttack = true;
+                    }
+                }
 
-            // Tag mobs hurt by players with the damage time stamp.
-            if (isPlayerAttack) {
-                entity.setMetadata(PLAYER_NAME_KEY, new FixedMetadataValue(this, playerName));
-                entity.setMetadata(PLAYER_DAMAGE_TIME_KEY, new FixedMetadataValue(this, new Long(entity.getWorld().getFullTime())));
-                entity.setMetadata(PLAYER_LOOTING_LEVEL_KEY, new FixedMetadataValue(this, lootingLevel));
+                // Tag mobs hurt by players with the damage time stamp.
+                if (isPlayerAttack) {
+                    victim.setMetadata(PLAYER_NAME_KEY, new FixedMetadataValue(this, playerName));
+                    victim.setMetadata(PLAYER_DAMAGE_TIME_KEY, new FixedMetadataValue(this, new Long(victim.getWorld().getFullTime())));
+                    victim.setMetadata(PLAYER_LOOTING_LEVEL_KEY, new FixedMetadataValue(this, lootingLevel));
+                }
             }
         }
     } // onEntityDamageByEntity
@@ -153,50 +176,76 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * On hostile mob death, do special drops if a player hurt the mob recently.
      *
      * Special drops are allowed in the end, even though the end grinder is
-     * cheap. The drop chance is scaled by mob type.
+     * cheap, by scaling the drop chance per-world.
      */
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
-        if (isEligibleMob(entity)) {
+        if (canBeDecapitatedByPlayer(entity)) {
+            if (CONFIG.DEBUG_EVENTS) {
+                getLogger().info("onEntityDeath: " + entity.getType() + " " + Util.shortUuid(entity));
+            }
+
             int lootingLevel = getLootingLevelMeta(entity);
-            boolean specialDrops = false;
             Long damageTime = getPlayerDamageTime(entity);
             if (damageTime != null) {
                 Location loc = entity.getLocation();
                 if (loc.getWorld().getFullTime() - damageTime < PLAYER_DAMAGE_TICKS) {
-                    specialDrops = true;
+                    doCustomDrops(event.getEntity(), lootingLevel);
                 }
             }
-
-            doCustomDrops(event.getEntity(), specialDrops, lootingLevel);
         }
     } // onEntityDeath
 
     // ------------------------------------------------------------------------
     /**
-     * Return true if the specified creature is a natural spawn.
-     *
-     * @param creature the creature.
-     * @return true if the specified creature is a natural spawn.
+     * Handle charged creeper explosions by dropping the head of the first
+     * victim to die (in a previous EntityDamageByEntityEvent).
+     * 
+     * The custom head drop is prevented by a prior vanilla head drop.
      */
-    protected boolean isNaturalSpawn(Entity creature) {
-        return creature.hasMetadata(NATURAL_KEY);
-    }
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof Creeper) {
+            if (CONFIG.DEBUG_EVENTS) {
+                getLogger().info("onEntityExplode: " + entity.getType() + " " + Util.shortUuid(entity));
+            }
 
-    // ------------------------------------------------------------------------
-    /**
-     * Return true if the specified entity type is eligible for custom drops.
-     *
-     * @parma entity the entity.
-     * @return true if the specified entity is eligible for custom drops.
-     */
-    protected boolean isEligibleMob(Entity entity) {
-        return entity instanceof EnderDragon ||
-               (isNaturalSpawn(entity) &&
-                entity instanceof LivingEntity &&
-                entity.getType() != EntityType.ARMOR_STAND);
-    }
+            Creeper creeper = (Creeper) entity;
+            if (creeper.isPowered()) {
+                ChargedCreeperExplosion meta = getChargedCreeperExplosion(creeper, false);
+                if (meta != null && !meta.vanillaHeadDropped && meta.firstVictim != null) {
+                    String victimName = null;
+                    ItemStack droppedHead = null;
+
+                    if (meta.firstVictim.getType() == EntityType.PLAYER) {
+                        if (CONFIG.CHARGED_CREEPERS_DECAPITATE_PLAYERS) {
+                            Player player = (Player) meta.firstVictim;
+                            victimName = player.getName();
+                            droppedHead = new ItemStack(Material.PLAYER_HEAD);
+                            SkullMeta skullMeta = (SkullMeta) droppedHead.getItemMeta();
+                            skullMeta.setOwningPlayer(player);
+                            droppedHead.setItemMeta(skullMeta);
+                        }
+                    } else {
+                        if (CONFIG.CHARGED_CREEPERS_DECAPITATE_MOBS) {
+                            victimName = CONFIG.getCreatureTypeString(meta.firstVictim);
+                            droppedHead = CONFIG.HEAD_ITEMS.get(victimName);
+                        }
+                    }
+                    if (droppedHead != null) {
+                        Location loc = meta.firstVictim.getLocation();
+                        loc.getWorld().dropItem(loc, droppedHead);
+                        if (CONFIG.DEBUG_DROPS) {
+                            getLogger().info("Charged creeper exploded, decapitating " + victimName +
+                                             " at " + Util.formatLocation(loc));
+                        }
+                    }
+                }
+            }
+        }
+    } // onEntityExplode
 
     // ------------------------------------------------------------------------
     /**
@@ -268,57 +317,186 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * Do custom drops.
      *
      * @param entity the dropping entity (mob).
-     * @param special if true, low-probability, special drops are possible;
-     *        otherwise, the drops are custom but mundane.
      * @param lootingLevel the level of looting on the weapon ([0,3]).
      */
-    protected void doCustomDrops(Entity entity, boolean special, int lootingLevel) {
-        if (special) {
-            String playerName = getPlayerNameMeta(entity);
-            Location loc = entity.getLocation();
-            World world = loc.getWorld();
+    protected void doCustomDrops(Entity entity, int lootingLevel) {
+        String playerName = getPlayerNameMeta(entity);
+        Location loc = entity.getLocation();
+        World world = loc.getWorld();
 
-            if (CONFIG.ESSENCE_OF_FLIGHT_ENABLED) {
-                double eofChance = CONFIG.ESSENCE_OF_FLIGHT_CHANCE *
-                                   CONFIG.getWorldDropScale(world) *
-                                   CONFIG.getEssenceOfFlightDropScale(entity) *
-                                   adjustedChance(lootingLevel);
-                if (CONFIG.DEBUG_CHANCE) {
-                    getLogger().info("Essence of Flight chance: " + eofChance);
-                }
-
-                if (_random.nextDouble() < eofChance) {
-                    world.dropItemNaturally(loc, CONFIG.ESSENCE_OF_FLIGHT);
-                    if (CONFIG.DEBUG_DROPS) {
-                        getLogger().info(playerName + " killed " + CONFIG.getCreatureTypeString(entity) +
-                                         " which dropped Essence of Flight at " + Util.formatLocation(loc));
-                    }
-                }
+        if (CONFIG.ESSENCE_OF_FLIGHT_ENABLED) {
+            double eofChance = CONFIG.ESSENCE_OF_FLIGHT_CHANCE *
+                               CONFIG.getWorldDropScale(world) *
+                               CONFIG.getEssenceOfFlightDropScale(entity) *
+                               adjustedChance(lootingLevel);
+            if (CONFIG.DEBUG_CHANCE) {
+                getLogger().info("Essence of Flight chance: " + eofChance);
             }
 
-            if (CONFIG.HEAD_ENABLED) {
-                double headChance = CONFIG.HEAD_CHANCE *
-                                    CONFIG.getWorldDropScale(world) *
-                                    CONFIG.getHeadDropScale(entity) *
-                                    adjustedChance(lootingLevel);
-                if (CONFIG.DEBUG_CHANCE) {
-                    getLogger().info("Head drop chance: " + headChance);
-                }
-
-                if (_random.nextDouble() < headChance) {
-                    String type = CONFIG.getCreatureTypeString(entity);
-                    ItemStack head = CONFIG.HEAD_ITEMS.get(type);
-                    if (head != null) {
-                        world.dropItemNaturally(loc, head);
-                        if (CONFIG.DEBUG_DROPS) {
-                            getLogger().info(playerName + " killed " + type +
-                                             " which dropped mob head at " + Util.formatLocation(loc));
-                        }
-                    }
+            if (_random.nextDouble() < eofChance) {
+                world.dropItem(loc, CONFIG.ESSENCE_OF_FLIGHT);
+                if (CONFIG.DEBUG_DROPS) {
+                    getLogger().info(playerName + " killed " + CONFIG.getCreatureTypeString(entity) +
+                                     " which dropped Essence of Flight at " + Util.formatLocation(loc));
                 }
             }
         }
+
+        // Player-caused decapitation.
+        if (CONFIG.HEAD_ENABLED || CONFIG.PLAYERS_DECAPITATE_PLAYERS) {
+            double headChance = CONFIG.HEAD_CHANCE *
+                                CONFIG.getHeadDropScale(entity) *
+                                CONFIG.getWorldDropScale(world) *
+                                adjustedChance(lootingLevel);
+            if (CONFIG.DEBUG_CHANCE) {
+                getLogger().info("Head drop chance: " + headChance);
+            }
+
+            if (_random.nextDouble() < headChance) {
+                String victimName = null;
+                ItemStack droppedHead = null;
+                if (entity instanceof Player) {
+                    if (CONFIG.PLAYERS_DECAPITATE_PLAYERS) {
+                        Player victim = (Player) entity;
+                        victimName = victim.getName();
+                        droppedHead = new ItemStack(Material.PLAYER_HEAD);
+                        SkullMeta skullMeta = (SkullMeta) droppedHead.getItemMeta();
+                        skullMeta.setOwningPlayer(victim);
+                        droppedHead.setItemMeta(skullMeta);
+                    }
+                } else if (CONFIG.HEAD_ENABLED) {
+                    victimName = CONFIG.getCreatureTypeString(entity);
+                    droppedHead = CONFIG.HEAD_ITEMS.get(victimName);
+                }
+
+                if (droppedHead != null) {
+                    world.dropItem(loc, droppedHead);
+                    if (CONFIG.DEBUG_DROPS) {
+                        getLogger().info(playerName + " decapitated " + victimName +
+                                         " at " + Util.formatLocation(loc));
+                    }
+                }
+            } // roll the dice
+        } // Player-caused decapitation.
     } // doCustomDrops
+
+    // ------------------------------------------------------------------------
+    /**
+     * Returns true if the specified entity can drop its head when killed by a
+     * charged creeper in vanilla Minecraft.
+     * 
+     * @returns true if the specified entity can drop its head when killed by a
+     *          charged creeper in vanilla Minecraft.
+     */
+    protected boolean canDropVanillaHead(Entity entity) {
+        switch (entity.getType()) {
+        case SKELETON:
+        case WITHER_SKELETON:
+        case CREEPER:
+        case ZOMBIE:
+            // Not players or ender dragons in vanilla.
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Return true if the specified entity can be decapitated by a charged
+     * creeper.
+     * 
+     * @param entity the entity.
+     * @return true if the specified entity can be decapitated by a charged
+     *         creeper.
+     */
+    protected boolean canBeDecapitatedByChargedCreeper(Entity entity) {
+        if (entity.getType() == EntityType.PLAYER) {
+            return CONFIG.CHARGED_CREEPERS_DECAPITATE_PLAYERS;
+        } else {
+            return (entity instanceof LivingEntity &&
+                    entity.getType() != EntityType.ARMOR_STAND &&
+                    CONFIG.CHARGED_CREEPERS_DECAPITATE_MOBS);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Return true if the specified entity type is eligible for custom drops.
+     *
+     * @param entity the entity.
+     * @return true if the specified entity is eligible for custom drops.
+     */
+    protected boolean canBeDecapitatedByPlayer(Entity entity) {
+        return entity instanceof LivingEntity &&
+               entity.getType() != EntityType.ARMOR_STAND;
+        // TODO: require spawn reason not due to spawner block.
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Return the ChargedCreeperExplosion metadata instances associated with a
+     * charged creeper, creating and attaching it as necessary.
+     * 
+     * @param creeper the charged creeper.
+     * @param create if true, create and attach the metadata if necessary;
+     *        otherwise, return null if not present.
+     * @return a ChargedCreeperExplosion reference; can be null if create is
+     *         false.
+     */
+    protected ChargedCreeperExplosion getChargedCreeperExplosion(Creeper creeper, boolean create) {
+        List<MetadataValue> metas = creeper.getMetadata(CHARGED_CREEPER_KEY);
+        if (!metas.isEmpty()) {
+            return (ChargedCreeperExplosion) metas.get(0);
+        } else if (create) {
+            ChargedCreeperExplosion meta = new ChargedCreeperExplosion(this);
+            creeper.setMetadata(CHARGED_CREEPER_KEY, meta);
+            return meta;
+        } else {
+            return null;
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * The type of metadata associated with mobs killed by a charged creeper
+     * explosion. Also applies to players if they are configured to drop heads
+     * in that situation.
+     */
+    private static final class ChargedCreeperExplosion extends FixedMetadataValue {
+        /**
+         * Constructor.
+         * 
+         * @param owningPlugin the owning plugin.
+         */
+        public ChargedCreeperExplosion(Plugin owningPlugin) {
+            super(owningPlugin, null);
+        }
+
+        /**
+         * Convert to String for debugging.
+         * 
+         * @return the String form of this object.
+         */
+        @Override
+        public String toString() {
+            return vanillaHeadDropped ? "vanilla head drop"
+                                      : firstVictim.getType() + " " + Util.shortUuid(firstVictim);
+        }
+
+        /**
+         * Set to true if the charged creeper killed a mob that would drop its
+         * head in vanilla. That suppresses the custom head drop.
+         */
+        boolean vanillaHeadDropped;
+
+        /**
+         * A reference to the first mob (or player) killed by a charged creeper
+         * explosion. If there was no vanilla head drop, then this entity will
+         * frop its head.
+         */
+        Entity firstVictim;
+    }
 
     // ------------------------------------------------------------------------
     /**
@@ -330,6 +508,12 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * Metadata used to tag naturally spawned mobs.
      */
     protected static final String NATURAL_KEY = PLUGIN_NAME + "_NaturalSpawn";
+
+    /**
+     * Metadata key for looking up ChargedCreeperExplosion metadata attached to
+     * exploding charged creepers.
+     */
+    protected static final String CHARGED_CREEPER_KEY = PLUGIN_NAME + "_ChargedCreeper";
 
     /**
      * Metadata name used for metadata stored on mobs to record the name of the

@@ -2,10 +2,13 @@ debug:
   config: true
   chance: false
   drops: true
-  allow_spawn_eggs: false
-  events: true
+  events: false
 
 looting_base: 1.3
+
+charged_creepers_decapitate_mobs: true
+charged_creepers_decapitate_players: true
+players_decapitate_players: true
 
 world:
   # Per-world drop chance multiplier (all drops); compensates for the end grinder.
@@ -37,6 +40,8 @@ drops:
       MUSHROOM_COW: 0.2
       OCELOT: 0.2
       PIG: 0.2
+      # 5*0.005 = 2.5%
+      PLAYER: 5.0
       POLAR_BEAR: 5.0
       RABBIT: 0.2
       SHEEP: 0.2

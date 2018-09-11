@@ -1,8 +1,8 @@
 package io.totemo.gonebatty;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -37,12 +37,6 @@ public class Configuration {
     public boolean DEBUG_DROPS;
 
     /**
-     * If true, spawn eggs are treated the same as natural spawns (useful for
-     * testing and debugging).
-     */
-    public boolean DEBUG_ALLOW_SPAWN_EGGS;
-
-    /**
      * If true, do debug logging of entity damage and death events.
      */
     public boolean DEBUG_EVENTS;
@@ -59,6 +53,22 @@ public class Configuration {
      * multiplier of ~2.2.
      */
     public double LOOTING_BASE;
+
+    /**
+     * If true, the vanilla charged creeper decapitation mechanic is extended to
+     * all mobs with a configured head.
+     */
+    public boolean CHARGED_CREEPERS_DECAPITATE_MOBS;
+
+    /**
+     * If true, charged creepers can decapitate players.
+     */
+    public boolean CHARGED_CREEPERS_DECAPITATE_PLAYERS;
+
+    /**
+     * If true, players can decapitate players in PvP.
+     */
+    public boolean PLAYERS_DECAPITATE_PLAYERS;
 
     /**
      * The per-world drop chance multiplier.
@@ -117,18 +127,21 @@ public class Configuration {
      */
     public void reload() {
         Plugin plugin = GoneBatty.PLUGIN;
+        plugin.reloadConfig();
+
+        // NOTE: reloadConfig() alters result of getConfig().
         FileConfiguration config = plugin.getConfig();
         Logger logger = plugin.getLogger();
-
-        plugin.reloadConfig();
 
         DEBUG_CONFIG = config.getBoolean("debug.config");
         DEBUG_CHANCE = config.getBoolean("debug.chance");
         DEBUG_DROPS = config.getBoolean("debug.drops");
-        DEBUG_ALLOW_SPAWN_EGGS = config.getBoolean("debug.allow_spawn_eggs");
         DEBUG_EVENTS = config.getBoolean("debug.events");
 
         LOOTING_BASE = config.getDouble("looting_base");
+        CHARGED_CREEPERS_DECAPITATE_MOBS = config.getBoolean("charged_creepers_decapitate_mobs");
+        CHARGED_CREEPERS_DECAPITATE_PLAYERS = config.getBoolean("charged_creepers_decapitate_players");
+        PLAYERS_DECAPITATE_PLAYERS = config.getBoolean("players_decapitate_players");
 
         ConfigurationSection worlds = config.getConfigurationSection("world.factor");
         WORLD_FACTOR.clear();
@@ -173,29 +186,40 @@ public class Configuration {
         }
 
         if (DEBUG_CONFIG) {
-            logger.info("DEBUG_ALLOW_SPAWN_EGGS: " + DEBUG_ALLOW_SPAWN_EGGS);
             logger.info("DEBUG_CHANCE: " + DEBUG_CHANCE);
             logger.info("DEBUG_DROPS: " + DEBUG_DROPS);
             logger.info("DEBUG_EVENTS: " + DEBUG_EVENTS);
 
             logger.info("LOOTING_BASE: " + LOOTING_BASE);
+            logger.info("CHARGED_CREEPERS_DECAPITATE_MOBS: " + CHARGED_CREEPERS_DECAPITATE_MOBS);
+            logger.info("CHARGED_CREEPERS_DECAPITATE_PLAYERS: " + CHARGED_CREEPERS_DECAPITATE_PLAYERS);
+            logger.info("PLAYERS_DECAPITATE_PLAYERS: " + PLAYERS_DECAPITATE_PLAYERS);
+
             logger.info("World drop factors:");
             for (Entry<String, Double> entry : WORLD_FACTOR.entrySet()) {
                 logger.info(entry.getKey() + ": " + entry.getValue());
             }
 
+            logger.info("HEAD_ENABLED: " + HEAD_ENABLED);
             logger.info("HEAD_CHANCE: " + HEAD_CHANCE);
 
             // Combine the mob type keys for head drop factors and head item.
             // Then show the combined information for both.
-            HashSet<String> mobTypes = new HashSet<String>(HEAD_MOB_FACTOR.keySet());
+            TreeSet<String> mobTypes = new TreeSet<String>(HEAD_MOB_FACTOR.keySet());
             mobTypes.addAll(HEAD_ITEMS.keySet());
+
+            if (PLAYERS_DECAPITATE_PLAYERS) {
+                // Force startup logging of player head drop rate.
+                mobTypes.add("PLAYER");
+            }
+
             logger.info("Mob head drop factors and items:");
             for (String mobType : mobTypes) {
                 Double factor = HEAD_MOB_FACTOR.get(mobType);
                 if (factor == null) {
                     factor = 1.0;
                 }
+
                 ItemStack headItem = HEAD_ITEMS.get(mobType);
                 String head;
                 if (headItem != null) {
@@ -206,16 +230,19 @@ public class Configuration {
                         head = headItem.getType().name();
                     }
                 } else {
-                    head = "none";
+                    // Say that players drop their own heads, if configured.
+                    head = (mobType.equals("PLAYER") && PLAYERS_DECAPITATE_PLAYERS) ? "own" : "none";
                 }
                 logger.info(mobType + ": " + factor + " " + head);
             }
 
+            logger.info("Essence of flight settings:");
+            logger.info("ESSENCE_OF_FLIGHT_ENABLED: " + ESSENCE_OF_FLIGHT_ENABLED);
             logger.info("ESSENCE_OF_FLIGHT: " + ESSENCE_OF_FLIGHT);
             logger.info("ESSENCE_OF_FLIGHT_CHANCE: " + ESSENCE_OF_FLIGHT_CHANCE);
             logger.info("Mob EoF drop factors:");
-            for (Entry<String, Double> entry : EOF_MOB_FACTOR.entrySet()) {
-                logger.info(entry.getKey() + ": " + entry.getValue());
+            for (String mobType : new TreeSet<String>(EOF_MOB_FACTOR.keySet())) {
+                logger.info(mobType + ": " + EOF_MOB_FACTOR.get(mobType));
             }
         }
     } // reload
