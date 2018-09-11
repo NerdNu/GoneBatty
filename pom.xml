@@ -28,6 +28,11 @@
 			<artifactId>spigot-api</artifactId>
 			<version>1.13-R0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>nu.nerd</groupId>
+			<artifactId>EntityMeta</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<defaultGoal>clean package</defaultGoal>

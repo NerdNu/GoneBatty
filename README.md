@@ -41,3 +41,7 @@ Permissions
 
  * `gonebatty.admin` - Permission to run `/gonebatty reload`.
 
+
+Dependencies
+------------
+This plugin depends on [EntityMeta](https://nerdnu.github.io/EntityMeta/).

@@ -19,7 +19,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -29,6 +28,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import nu.nerd.entitymeta.EntityMeta;
 
 // ----------------------------------------------------------------------------
 /**
@@ -98,9 +99,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason() == SpawnReason.SPAWNER) {
-            // TODO: EntityMeta integration
-        }
+        EntityMeta.api().set(event.getEntity(), this, "spawn-reason", event.getSpawnReason().name());
     }
 
     // ------------------------------------------------------------------------
@@ -428,9 +427,12 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * @return true if the specified entity is eligible for custom drops.
      */
     protected boolean canBeDecapitatedByPlayer(Entity entity) {
-        return entity instanceof LivingEntity &&
-               entity.getType() != EntityType.ARMOR_STAND;
-        // TODO: require spawn reason not due to spawner block.
+        if (entity instanceof LivingEntity &&
+            entity.getType() != EntityType.ARMOR_STAND) {
+            String spawnReason = (String) EntityMeta.api().get(entity, this, "spawn-reason");
+            return spawnReason == null || !spawnReason.equals("SPAWNER");
+        }
+        return false;
     }
 
     // ------------------------------------------------------------------------
@@ -503,11 +505,6 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * Plugin name; used to generate unique String keys.
      */
     protected static final String PLUGIN_NAME = "GoneBatty";
-
-    /**
-     * Metadata used to tag naturally spawned mobs.
-     */
-    protected static final String NATURAL_KEY = PLUGIN_NAME + "_NaturalSpawn";
 
     /**
      * Metadata key for looking up ChargedCreeperExplosion metadata attached to
