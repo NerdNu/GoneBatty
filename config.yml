@@ -11,7 +11,6 @@ charged_creepers_decapitate_players: true
 players_decapitate_players: true
 
 world:
-  # Per-world drop chance multiplier (all drops); compensates for the end grinder.
   factor:
     testing: 1.0
     world: 1.0
@@ -22,17 +21,9 @@ drops:
   head:
     enabled: true
     chance: 0.005
-
-    # Mob type specific factor multiplied by the base head drop chance.
-    # If the mob is not listed, then the factor defaults to 1.0.
-    # Note, however, that spawner mobs don't do special drops.
-    # For the purposes of this config, we're setting the drop rate of anything
-    # that can be relatively easily farmed (i.e. animals, slimes, villagers and
-    # guardians) at 1/10th that of hostile mobs.
     scale:
       CHICKEN: 0.2
       COW: 0.2
-      ENDER_DRAGON: 20001.0
       GUARDIAN: 0.1
       IRON_GOLEM: 0.2
       HORSE: 0.2
@@ -40,7 +31,6 @@ drops:
       MUSHROOM_COW: 0.2
       OCELOT: 0.2
       PIG: 0.2
-      # 5*0.005 = 2.5%
       PLAYER: 5.0
       POLAR_BEAR: 5.0
       RABBIT: 0.2
@@ -49,79 +39,477 @@ drops:
       SNOWMAN: 0.2
       SQUID: 1.0
       VILLAGER: 0.2
-      # Wither skeletons drop their heads naturally.
       WITHER_SKELETON: 0.0
       WOLF: 0.2
-
-    # Skull owners for head drops, or missing for no skull.
-    # texture data instead of the owner, in a later version.
-    # Any mob that doesn't have an entry won't drop a skull,
-    # e.g. WITHER_SKELETON.
-    owner:
-      BLAZE: MHF_Blaze
-      CAVE_SPIDER: MHF_CaveSpider
-      CHICKEN: MHF_Chicken
-      COW: MHF_Cow
-      ENDERMAN: MHF_Enderman
-      ENDERMITE: MHF_Endermite
-      EVOKER: MHF_Evoker
-      GHAST: MHF_Ghast
-      IRON_GOLEM: MHF_Golem
-      GUARDIAN: MHF_Guardian
-      # HORSE: doesn't exist
-      # HUSK: MHF_Husk doesn't look like a husk
-      MAGMA_CUBE: MHF_LavaSlime
-      MUSHROOM_COW: MHF_MushroomCow
-      OCELOT: MHF_Ocelot
-      PIG: MHF_Pig
-      PIG_ZOMBIE: MHF_PigZombie
-      POLAR_BEAR: MHF_PolarBear
-      RABBIT: MHF_Rabbit
-      SHEEP: MHF_Sheep
-      SHULKER: MHF_Shulker
-      # SILVERFISH: shows as a pumpkin :(
-      SLIME: MHF_Slime
-      SNOWMAN: MHF_SnowGolem
-      SPIDER: MHF_Spider
-      STRAY: MHF_Stray
-      SQUID: MHF_Squid
-      VEX: MHF_Vex
-      VILLAGER: MHF_Villager
-      VINDICATOR: MHF_Illager
-      WITCH: MHF_Witch
-      WITHER: MHF_Wither
-      WOLF: MHF_Wolf
+    item:
+      BAT:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Pu26DMBhG/1aqRFEfoysSmEvDkCGqKDEKphASYjYuthLHpBGBNua5+oBl7Hj0nW84OoAOL9vzKOVn/8VPkmnwiFt4bXhbcd+0DWvRcMOpfGRUDUcG49XCQ17DzRrpoM+nK+uHE7s9gzaw+zD27KYDwIMGT/tKjgx+mYrM8nA020MkG4W9mfOtKRMsrm/4slf1O/ZwN+/rlbdR/j/XHarCldSOjuUlHetub27sTLJ1ZjXd7jspdm5SZLIsqBvn8kwFRbSIFe1SlYQpiqeVItMOUUTOJG8FQdShIlBUzC4KnFKkdzoRGYfBDwk/RFwQgS+Wz9Plci6AP0M4xs0cAQAA
+      BLAZE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzW6CQBhFvzZpYkkfo1sSQH5k4aJpQYfIWFAZmR2DQ2E6Yw2Cis/VByzLLm/OOYurAWjwsvnupfxsf6pG8gk8ogO8eiVnsxmzdK9yKt2e+r5eMObrnuHOLMdkReEfNNDG6MTbruHnZ5h0/Nb1LT9rAPAwgaeskD2HXz5EBt3XxmEfyXJA7ri3G0OukTh56JgN7B25SI18+eauBv+f63QFcWQ+jWp6THqmMmM1TSVfpmapdpdclDYl+UC3qaAiEvgjrGOV3PAiUnSxc3IrVFQE11gEDhVZE5NIYYLumATGmmQN3oYCi8TC9y87VrjBJL+io+lXyXw+PoA/ZLeQMhwBAAA=
+      CAVE_SPIDER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy26DMBREbytVoqif0S0SYB5lWZVIMQqmJMQ8dg6YhmDSiEAT8039yHrZ1Wh05kijA+jwsutnIT7H77YTXINH3MArCiwfMZ8ZdeD6hsNry2C1xQwHcZd5TvCGmlYHXUkXPk4dvz6DNvH7NI/8qgPAgwZPlImZwy+XkVkVR7MpIlFL7Kme7UyR4NPFx2cqDx/Yw4Pi63dvI4N/W3diuStKFB2rczofBmpu0Fbw9daqh/0PCVc2CWlfDSkidnpLsl7Gy+pGbLyQsLerrDernHYkj5c4jGWSly6x6VAuiuXKGfYyPlUiyb5Upl1bWIF6Dn/5XmYRFAEAAA==
+      CHICKEN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzW6CQBhFvzZpQkkfo1uSGRGpCxdNpXWMMEURZHaDDOFnxhoFhXmuPmBZdnlyzl1cE8CEl13TSfl9+SkqKQx4JDm8urnN3/hRWAJNHWsqMm7xzMWWi/OscCZOzgtsgjmOzuLSVuL6DEYr+ra7iKsJAA8GPMVcdgJ+xbBG7FCi/LCWx4HMRo52SFJSn11yiofsg8yIGv3qfbYZ5v9ap+WJI1N7XbJT2GUqRht7K8Vqi49qf/OjVNNlOKGJh2kka5bEKtDkHui9DnR69zVB9Mtz0oT0fsJUEDU9U+HoyoolHgq0j9PaR4HybKY+JV02mpzwvAgXi/EB/AE9ZdW5HAEAAA==
+      COD:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBiFf01MkPgYbkmGy4BduDCV0iGFCkUKs2NgKJeZ2rRgwKfyEWXp5iQn3/mSowKo8HToRyE+rl91K7gC96SC58qurNKxLA3ZzNKs4qXQWOksUTHkOIgxvaxVUBfpwq9Dy2+PoAx8GsYrv6kAcKfAQ1qIkcMvn31EswZVmS/KmdhLTw5I7El3ccg5ndma2EQufPtm7+bVvy0eiiMWuek39ByNTKZoZ8aCb2O9lJ/f4c8JBzIyqRcZ+XHT0y7QaXcyqOfOoUHbsAv7PIkF9eIm6NyJejkOZTTv3wmmXY6DJDIC6SIqyZQbmzZY+6s6Q6/Le/gDNJMZohgBAAA=
+      COW:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PwW6CQBRFX5s0saSf0S3JyFSQRRdWqg5xoOKADrsBngEdrEFoxO/qB5ZllzfnnMU1AAx42Z46rb+a70OlcQSPrIDXAhVVqGwzt93MfEPMTFeNpyZB6rjWQVFHTQ0whuiCTVvh9RlGLd7arsGrAQAPI3hKlO4QfrH3SbovSbH3dd4ze9hiS3TIjheHnZM+mzOb1QNfzex17/5zJ63aTbSkfpmeN11WJ2RNI42raJzX8U9gRbUUH6W8cyrrRSWFX0rBJnwZk7Re6FRsbuHu0+IiOKaevHFRDH5shcuYck+fQjG7B/cNDQbOPd6ny6Dic9897Mn78AD+AFYoht8cAQAA
+      CREEPER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: CREEPER_HEAD
+      DOLPHIN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py26CQBhG/zZpQkkfo1uS4TbIwkVto46RoaNcHHcCQwFnrFFoxOfqA3aWXX4531kcE8CEl+1xkPLz8l23UhjwSCp4nRRBWVa4slxcCcsLBLImlX+wcI2DMCxxLYqJCaaWzuLSt+L6DEYvbv1wEVcTAB4MeMoOchDwK8YV2u8aVO1WshwJ1jvZIhmT7hyQUzYW7wQTpfnyDa/H8N/X7w+5L7m7avYnNhQqQ2t3I8VyY5cq/YkXqU+7L493RztaMC/+mLU0yVrqzJtIUcUd5lKV2jyZKZ4cEc/nHVXspomrXS+6U0XvDEVO1kSdVPuc3cnJDms2neoC+AO9F95oHAEAAA==
+      DONKEY:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBhFP01MkPgYbklmppTKwgXVaId0QFoEhh0/QyidqU0LCjyXD+gsXZ57z11cE8CEh/1xkPLj8tUcpDDgltbwSJzGdsWTsIiNbctGwrZKsXKtpmpcgosa15iYYOrRWVz6g7jeg9GLsR8u4moCwI0Bd0khBwG/YvJRnrWoznxZTdTRHO+RDGl3XtFTMpUv1KFK9xvP2U7uP3fZF+lS8oXf5qdoKFWCtoudFJsdrtTnd9AFbRhXhM8eCghHLPYlVwxzQkedj2x+05woNq879uohPq8VTzkK08jO3yPtezhXQcti+hOQ5MjTXLHJd5sMPesH8AejQNfvHAEAAA==
+      DROWNED:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBiFf01MkPgYbkm4ONOwcFGNoUM6UynXYcdlCB2H2rRgyzyVjyhLl+d850uOCWDCU/w1KfV5/u4OShhwT1p4djsH+xjbFnZqYb3gurWqpkaWU9Wi8zuBVp5jgrlIJ3EeD+LyCMYobuN0FhcTAO4MeMgqNQn4FXNol0Vvt0WompngJSexrXZEnlbkmM31O8FkWPhmjbez/2+LxipHinthXx6jqR4ye+vtldjsnWZIf7hmA3OZLCW/lUEoqctROaSIJ1xTvfRBeuX6TdEk0rtEKS5DVeYfHs0jzQI2UEk0l6znbjpTuXZoHPpdYb8u7+EP/3thHRgBAAA=
+      ELDER_GUARDIAN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OwU6DQBiEf01MkPgYXkmWhUU5ViHpku5WKQWWW4HFQpfaUGhcnspHlKPHmflmMiaACU+706TUx/DdtEoacE9reH7FdeO4bmVh0jSWK4m0Sh/7loMxQsj2GuQRE8yldJHD2MrrIxij/BmnQV5NALgz4CE9qEnCr9QRKvIjqvNIVZp6i052SG1pd3mh51SX79Sj/ZKvV95G+/9YMh4yooQTHYvz51T2Kdo4sZLr2K76/a1ITpoFX4R3ocsDZovkTRWdmBffLrI94VlIWE9dNq8choUrZjYXfehwHHc8YZgnIdlmy3bAZtEJzRPRNrntL+/hD8iXxhAYAQAA
+      ENDERMAN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkmmDBRYuDD2NqQMShE67OgwyGWmNi20wnP5gLJ0cRYn3/kWRwfQ4WnX9lK+n7/LWgoN7kkBz8jhrsXN0pgVjjAs7pZGjlxucIw9V5geKkpbB32STuLc1eLyCFonfrr+LC46ANxp8JDkshfwKwYfZfsKFXtf8oHMpx7vkAxJc3LIMRkOb2RO1MQ3r/Pt4P3b2l2e2pJhv8qOH/1BJWiLIyk20YyrzytTq5YuWpONDNMFu4Vx0dC4aoJ11mYLqsJ1UgUNvwXjF2ZmpGhKVRZPUUnF4iWm49IK05UK4uXIUjLQNKmz2vfKPXqZHsAfXfj6JxwBAAA=
+      ENDERMITE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PQU+DMBzF/5qYTOLH8EoC7YrbwYNxmrVZOzcQRm9QSgDbuTCYg8/lB5Sjx/d+73d4DoADD+FXb8xH+13WRs/glhbwmJW+9hUpXIWz0p0TRdwl1rmLfKRQNl8QjBcOOJN00m1X6/M9zDp97fpWnx0AuJnBXZyZXsOvHpgnD5VXHJhRAw2mHIWe2dLm9ESP8ZC/0oDaia9fgs2w/LclXZYQk2JWyeOuz23sbfDe6PXeV/bzIhLWCESJXHEkLSXcUpTadNhGrJaRGqd+SEfZiIT+yEQ0vIlrsdqNvBGViHZXad8NT9KrjFIsI044ehtlyJblwXueHsAftZ5paRwBAAA=
+      ENDER_DRAGON:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: DRAGON_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+      EVOKER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBhGf01MkPgYbkkYKBQWXRgpdkgHhHIps+MyhMKADYWm8Fw+oCxdfjnnLD4RQIS3Uztx/j38VBfOBHjGJbxXrFI3SEeSkRu5tDF0JpmlrkoGy1GVZduiUJAI4hpd2TBe2O0VhJE9xmlgNxEAngR4iTM+MfhlsyPTcy2XZ4cXM9bXHZ5k7uHmusV9POefWMfdyg8f+nE2/7namCUaT1Wnpr0/5V0sH9WAs0OAii66U6tFrrVf3CRoPAvPJCSau9Rt2viqZxWq92VzEuIHWSKNJFgjij+Tpm7JQltqRTJtbJ6GdpuG/oaGZZN2ewX3yKz83W59AH9xfnD7HAEAAA==
+      GHAST:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy26CQBhG/zZpYkkfo1uSAeQyS1O8zESh1RGZ2QEOFZixRsEIT9VHLMsuv5xzks8AMOBt13RKfV5/ykrJCTyTI7wHyC/twC9Nb4qxOZXYMbMg8E2U2TjIcgdhqzTAGKOLvLaVvL3CpJWPtrvKmwEATxN4STLVSfiVPUUiPaFjSlXRE2/cbIdUTOqLT85Jn38Qj+iRr2beusf/XLfNDq7iDj2J81eX6wStna2Sq61V6P09XhKbs6LfsM1UhNwVmlYipFoc5oPQ8z5ii5ofaBOHxSNiVEVL/uBD4wiW6Jh921xzOw73VjQsGl5HNR9mVZlaeHwPf1oczuAYAQAA
+      GIANT:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: ZOMBIE_HEAD
+      GUARDIAN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Pu26DMBhG/1aqRFEfoyuSuTYeMvQiNUaBFOJC7C0YUzCGRgmkIc/VByxjx0/nO8MxAUx42Laj1h/H76rR0oBbUsJj4Cwq2y+RJV0sLK8qsYWFJ62F8OzSq3yvcLAJ5iwd5HFo5OkejEFehvEoTyYA3Bhwl+31KOFXTiHiuxqVu1CLiQTzplukN0QdnkifTcUrCUg389VzsJ7wv68/7HNfMzeseZ+MRZehtZtquUpt0X2eGX1puIoQo+LCqXAjmjVxF9YxDds4T9sonz2aKaa+bK5m7qRqk5Mf/pbYsUMQ67iKc+bz9+TKnMhl1xaR3sZVslzOBfAHUvEmOBwBAAA=
+      HORSE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2O306DMBxGf5qYIPExvCWhhTK5NAZdyYqyMUZ7x58SKGUuDMzgqXxEufTyyzkn+UwAE54O3aT11/Bdt1oacE8reCY5Jq4nkYUxciy3xrn1UhbSInVdVbUjN9jzTTDX6CKHsZXXRzBGeRunQV5NALgz4CHN9SThV86hLbLGrrJQlzP11p0cbP1J1WVDz+lcvFGP9ivfvnq72f/nkjE/Ec2dsBHneCr61N45ey23e1T2xx+uOOYqbNkSdmwJEFu0ihbmMhwTpqKWn4626N8boTgSHwGOVofjGDElFFvSjvUrT7jLVNrxJLiJnrZ1hvz1PfwBi4KhkxgBAAA=
+      HUSK:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBiFf01MkPgYbkmGS6FdGkU6pIDQchl2XH4COFMbCk3hqXxEWZqzOjnflxwZQIaX4/fE+dfw03QcJXikNbyqRYmqYZUKFlahGBaplC1ahqKaFW4brM2qNGWQV+mCw9jh9RmkEe/jNOBVBoAHCZ6Sgk8Ivzi7JM9aUmcur2Zqrv10JDyg/cWi52Qu36lJxbrv38zDvPvHbsYi3XCmu21+DqdSJOSgRxz3kVqJ+JZ/MN13PG2NkTtUzfuoZyc2B06oBam9sP5TBI69+CKegzQ0chHq/pJwL7U1JqLOF37LBCVMxGT1715vd02m7tb38AdccZzDGAEAAA==
+      ILLUSIONER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PQU+DMBiGP01MkPgzvJIU2jI57GB0upJB3VbZ2huwsq2UuWygY7/LHyhHj0/e5z08LoALD8u6s/bj9FXtrXbglm3gMUcBKQtUemGFqEeopl5BNPZwGEVPZBT4CAcuuMPpqE/tXp/vwWn1pe1O+uwCwI0Dd1luOw2/uo+RWu/QZh3bsmfhwGKJLGfmOGKHrC9eWMiaYZ8+h7M++ufSNl9RK3G8U4d5VzQZmuGF1dOFXzaf38kqCdLrzvCVRPKqavW6qLmoL1wkP8pseyWUTYM5kWZLpWGEi7cmuWZGNhPE3ydImglJRUJlEw9eZrhgmB38qJqPx0MB/AGWTPPYHAEAAA==
+      IRON_GOLEM:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OwU6DQBiEf01MkPgYXkmgFMgeVWq6pIDQlcLegF0ssFsbClp4Jh/S9eZhkm8yM8noADo87PtJiLfhs2kF1+AWM3j06srlqHQMhNaNsTaZoqqpjXVVOsxDLltZXAddjc58GFt+uQdt5NdxGvhFB4AbDe6yUkwcfvgcmDQ/miwPRD1jV3myN0WMu7OHT9lcvWAXS5Vvn9zdjP51nbE8OKKwgyM9JVMlM3Nnp4JvU6uW71+x33/H5LWPFiEK8iwjIgTtmFJvUp+1hdysKMlkSJgMZWFTP7GiJegiP5XxX3+hij+u8WFjhyRpm9xC6jn8AugqC/cUAQAA
+      LLAMA:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzW6CQBhFvzZpQkkfo1uSYYYfWXRhtFGIM1REYGYHOhRwsEahFp6qj1iWXZ7cc5OjA+jwsjv1Sn1cv8paSQ0e/SO8unZZoJm0DWyZnmE5ZW4UJfIM2yUONsmsxMTSQZ9OF3ntanl7Bq2TP11/lTcdAB40eEpy1Uv4lUOARFahYxaow+A7E8c7pEK/ubj+ORmKhe/47bSv585m8P65dpentuIkqMR52xdtgjYkUnIdmYd2/83HoKZp0oiWE4ZFK2JWs3g+8pHeebxH4SqpacMqmr7fw5Wo6GSKJSccR61oqBXGnyZLt4QtTwONKQ4XgVdm6G2qhz9B7r6jGAEAAA==
+      MAGMA_CUBE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzU6DQBhFP01MkPgYbklG6EBn4aIx2g7pgBQEhh0/g3QYakOhKTyVjyhLVzcn99zk6gA6PIXtqNRn/1MfldDgnlbwTOy8FJW9MnCxxsaqIMQo1iY2sFVWTk5q4pi2DvoyOot+OIrLI2iDuA1jLy46ANxp8BDnahTwKyYXZWmDqtRV5UTthaMQKZ/Ks0NP8VS8UZt2S7/b2PuJ/HPxkCdYccttslMwFl2M9tZBid3hpey+rmz+xl5UtV60mZjJMJsr6W0ZYslHw2RwY12A2Lzk1m15RGducstP3nEms4ZLZnJZmlkXd4tn8TmY/NAldYpel/fwBz5HZJgYAQAA
+      MULE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2O0W6CMBiF/y1ZwsgeY7ckBQTl0kydJYITO6S9A1oCtXUGYROeao84Lnd5zne+5JgAJrwcz71SH+1X1ShhwCPm8GpX3OOFjyzXCSprxktuBWLBrTmf5bz0F1XlBCaYk3QVbdeI2zMYnbh3fStuJgA8GPCU5qoX8CuGELGsRjwLVTlgf8rkiNQey+scX9KheMM+1hPfLv3dEPzbel1+8hR1w5pdDn2hU7RzEyW2iV3qz29Klmi/YnU8HgZG+Jm9r3+o3qhYbiQjoY5JqilZjzHBLpu6yMFjNCYyJlxGqwhRjRF16D0aQ01lquMTbarMDqb38AcG+OoaGAEAAA==
+      MUSHROOM_COW:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBhGf01MkPgYbklmGC6ycKES2yEdsPQCM7sBphY61KaFxvG5fEBZujz5zrc4NoAND6vDqPXH+WvXamXBLW3gMSIkeEKu5xAZSscLPM+RMowc0tSNqnYeVhLbYE+nkzoPrbrcgzWo72E8q4sNADcW3G2lHhX8KpMgUe5RUya6NjSYeL1COqPdKaTHraneaED7aZ+/BAsT/XP9QRa+5iTZi+NyrPotWpBcq3mO635zZT3FrPtErOBG9EucxVqzWdJlcd7x/r0V3cQFM6mbtunPa8cL5mcz7olYtMzNDyzmWKw3mK/zA3cpYbMlSU0S7Ur0PBXAH6xivUscAQAA
+      OCELOT:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2O306DMBxGf5qYIPExvCUpg3bhUs1kJWunDBjt3YAif8pcNjDAM/mQcunll3NO8pkAJjwd2kHrj+t3WWtlwD0t4JkQtyhcb2U5ZV5YrutklqeIbbn5WmWFp1xlIxPMJbqoa1+r2yMYvRr74apuJgDcGfCQnPSg4FdNAZJphYo00PlEybKjA9J72lzW9JxM2RsltFv49oXsJu+fi/vTEWvhBJU8fw5Zl6CdE2q1De28i394JGy+4i0/smkffWHZCczn2GG+1GIOW+nzVswCs0ZWvKkqNjPMZmozn42ii0fZvNYs2iARvbei2dRlanvLc/gDzjbL7xQBAAA=
+      PARROT:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OTW6DMBhEv1aqRFGP0S2S+TENiyyqNiJGwZQkQPAOjBEBQ6MEoppT9Yhl2eXMmyeNDqDDy6GbpPy6ftdnKTR4JBW8ejW3V3VZGTVH3HBMxzWKqrINi/OVwAUyHcx10BfpIq7jWdyeQRvFzzhdxU0HgAcNntJCTgJ+hQoQOzWoOgWSK+Iu+XhAMiLt5Y0MqSo/iEv6hW/f3Z3y/m3xWGRY5nbQsCGeyj5FO3svxXZv8j6553Po0LmzWJsr5hOTtd0cHWOcZ4mi/UaxtmpCK1x6jqm1mcMsVrTtUN5TSf0QRX4qo894Zlni0Cy3yWB6dbxeL+/hDxjTsH0YAQAA
+      PHANTOM:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBhFP01MKvEx3JIMP4OwcFEF0yGdqdIW29lNYRCGoTYUbOG5fEBZujy55y6OAWDAw7rutX5vv4tKyxnckhweAztAIs99M7MDy3QFFqZf+MLEgVtYHnaRJxwDjOl0km1XyfM9zDp57fpWng0AuJnBXSp0L+FXDjHiuxLlu1hnA/Em3qyRXhF1eiLHdDi8Eo80076Ye8sh+OfiTnxivXfikh8/+kOToqWTaLlIrKzZ/jB7i9kmsqidKqrosAqTiqqvkav5hYcR5iHBbNzaXBHEQnqldnRh6q1i40u5H+fjXtXO5IysSTXb5BUPa5dWcVDs0PNUAH/9jGDLHAEAAA==
+      POLAR_BEAR:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzVLCMBhFP51xBjs+htvOJP1J24ULBYR0aLClIsmukEBpU2SgVZvn8gHt0uWZe+7iWAAWPKzqTuu3y+f+qNUIbqmER9dR27Ag2CaKENuTe2mHgafswAsxjhDCXhFZYA2ns7q0R3W9h1Grftruoq4WANyM4G5d6E7Br+pjJDYlkptY73pKBs5XSC9pdQ7oad1vx5TQZtjnz2TRR/9cvy0+fM3duBSntNs2a7RwM63mGd4171/cSbGY8G+eZzUzL5qbqWHN1GH5AScTWYn80Is8QWzCKjF7LRNT4+UsdUXDysRJ/cTsBnfqciNrXmWaVTUW4zjab9DTUAB/bANnwBwBAAA=
+      PIG:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OwW6CQBRFX5s0saSf0S0JzIiWRReNtnWIPCqCOLNTeAZhxhoFA/2qfmJZdnlzzkmuBWDB07putf66fB+OmkZwLwp4JpfcnNHYdqlg9njKC3tfELM55VP3xeMe930LrCE606U50vURRg11TXuhqwUAdyN42Ox0S/BLfeCobekU20DnvZgMO1k7OhLVeSpOm34/ExNhBr54myx7/5/rNbvM05IHpTqt2r3ZOEsea1rEbm7SG1aiw0qOVSa5ZIJHWVxHWdiHBnXIVp2q0OAnHtGkPSapF83rH1mpWlVxiXPpYfLuqEQyZGGH5qPEWeAfts7r8B7+ANGrCfkYAQAA
+      PIG_ZOMBIE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBzE/5qYIPExvJIsX1s59GAE2yUFLEUoe+NjsSwLNi2YwnP5gO7Rwy+TycwcRgVQ4enQTUJ8XL6bVjAF7kkNz9i2UIUsrNWYFZpVNI3mrDDWTKOwLVYy7NgvKqhydGaXsWXXR1BGdhunC7uqAHCnwENaiInBL5t9RI8nVB99Uc0ES58ckIgIP6/IkM7lG8Gkl/n2Fe9m51/XHovMFrnpn+iwn8o+RTszFmwb61X/+RMusYiywKBJZ4XJ10x72kUb2ktEzoMl4D6nrmeFruChG/Y59wyJHm3eW6m33PDMnO9nmsWncKlQYKQtGXSn2a/X8gH8AU3bmhUcAQAA
+      PLAYER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+      PUFFERFISH:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OyW6DMBiE/1aqRFEfo1ckm61w6KFqDjFKnM1l8Y3FxAaTRgSqwFP1Ecuxx5lvPmlMABNeTu2o9b7/rpUWBjySCl5tLxAOxq7l+EFpuUGOrcCrK6sQXoBCbNeoqk0wF+kq+kGJ2zMYg7gPYy9uJgA8GPAU53oU8CumCPFUoiqNdDkRf8nshPSONNc3comn4pP4pFv4+sPfTOG/rTfkiaczJ5L8chiLLkYb56jF+ojL7utny8o7ZcSlM1fZTOWO8ZavIrltiLdjBNEkbrOGKp7EHW0OTjZLSRmX2Xx2KaOSNuelo5raBPOVVJmKwjpF78t7+AML11oBGAEAAA==
+      RABBIT:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBhFP01MkPgYbkmAMmAXLozUdkiZCh0pw46fgYEOtaFQoc/lA8rS1c3NuWdxVQAVnvbHQcrP7rusJVfgHhfw7BhO6pgo00zklJplOKaWFVmqoYK/IN0uM7vIVVBn6cy7vuaXR1B6PvZDxy8qANwp8BClcuDwyydPT2KhF7En8wnbc6d7Xe5wc3bwKZqyd2zjduabN3s7Lf9tUZ8ekGQLTySnYMjaSN8uQsk3oZG3X1diBqNPGWINNnc0FKT9qBmtJtL4pu8ekT8nOXhNsl4ZjK5+2K1CjBLBqFcTVzTE9S1C/TFZBxZpKoPdiCCTtyxj/XV+AH+yVeNHHAEAAA==
+      SALMON:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBiFf01MkPgYbkmAAQrLalM7pDBCh+sO6FQuM7Wh0BSfykd0li7P+b6THBVAhZfDMHP+OX6fOs4UeMRHeNWRbTUW0jXkrTzNqh2mucyxtcrzWI1Y5bqGq4IqRxc2Th27PoMysfs0j+yqAsCDAk9pxWcGv2zx9TJv9WPu82bBjsz0oHOC+8sKn9OlfscOFpLv1s5+8f659lRlNi+Q35bnaK5Fqu9RzNkuNhqR3MjHlhc9vhcUGyWNTLJZm4WZWCENUCn8IewL2WEryEIR0EaytC1FYofZVhD6xgmN2zArB7KJ7KCPrPDnqzvlhiffwx8l+NlQGAEAAA==
+      SHEEP:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzWqDQBhFvxYKVvoY3Qpm/KvLUEoyEjVNjDruHB3RcUyD0aLzVH3ETndd3MXlnAtXB9Dh5dzPQhzHr6YTTINHXMNrUyLL9pFj+DVlhk3fGqN0bNvwKs9sqEvdsnJ00NXoxsapY/dn0Ca2TPPI7joAPGjwlJZiZvDD1sAs8tas80BUK3ZVT86miDG/efiarvQdu3hQfL91D6v/z3WmMnMEsYK2uH7OdEjNg3USbH/aVMPlu+DhUnDBCQoR4ZEIZSAIIkuIsE2Sj4Vk4RpnUR9KlaTlcZIORFay2P1xZcq0j/jFIijq4l0gIrntmnzjq/fwC30sBa4YAQAA
+      SHULKER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzU6DQBhFP01MkPgYbklGKH8LF42m7ZACQoGB2RUYBDpTGwqm8FQ+ouPO3T255yZXBVDh6XCaOP8YvpqOMwXucQ3PtY1QiUpXK5m90laWgTSnKk3N0ivXdh3dYY2lgipHFzaMHbs+gjKy2zgN7KoCwJ0CD9mRTwx+2Owhmreozj1ezdiSnBwQD3F/sfE5m8s3bGEh+93a2s/uP9ccj8TkheG19BxNpcjQ3og528UvlUi/i35z8pd0CbbR7BPKw/fIDBOs+yKWuW6poB0lm/6vD4ikrXSJvypE3BfJWg9JqvskvQXLp0FFMdPOc5scvcr38AuVuoeBGAEAAA==
+      SILVERFISH:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBhFP01MkPgYbkmGMkBYuGilSYd0UFugDDsYhvAzUxsKWnguH1DcuTy55y6ODqDD07EbpXzvP6tGCg3uSQnPXCCHu9g1Clx5BsZebhScF8bKEi4XjpVj09ZBX04X0Q+NuD6CNojbMPbiqgPAnQYPSS5HAT9iClCW1qhMA8kn4iwcHZF8I+3FJedkKl6JQ9Sy79bOfvL+ufaQn2zJrKDOzh9joRK0tw5S7A4mV/EXiwjOou132K5tNnMU+lKxuayZopjOQUPnTctOW8SiTZv5ssuiTNE2xn9+uKJ2qOiNzXUbqthkc2dSv1bhFHhVil6WAvgFk9+VaRwBAAA=
+      SKELETON:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: SKELETON_SKULL
+      SKELETON_HORSE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2O0U6DMBhGf01MkPgY3pIUGCgXuzAu2UpWdAzY2rtRCqy0uDBYBk/lI8qll1/OOclnApjwsm8Gpb67n/KshAGPuIDXnOdceHlpvft8YS2E71hByT0LcR6gQgSL3C9MMOfoIrr+LK7PYPTi3g+duJoA8GDAU3ZSg4BfMYaIHWtUHEPFR+zPO9kj9YXl5Q232Zh/Yh/rmW8+/O0Y/HO9/nTwFHXDmrW7IdcZ2rqxEpvY5jq9RatCMc0kS4hNEjLSqXKYpi7RoaSH1I2cWFON72yFxyipXJY0iK3pRJ1QEpm6ZJ01JCkkk5UXTVGNWzsod8vl/B7+AP4g3FEYAQAA
+      SLIME:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkmGcisLF8aJ6ZA6CG2BYcdlCJeZ2lAwHZ7LBxR3Ls/5zrc4OoAOT4dhFuJz/Go6wTW4JzU8ew0q0dazjLpxC8MuTN/wy6o2GrfyEW+2yK48HfRVuvBx6vj1EbSJ36Z55FcdAO40eEgKMXP44SpAedaiOgtEpYi75uMBiZD0F4+cE1W+EZfIle9e3b3y/22dqUgdwaygzc/RXMoE7a1Y8F1sVvL0HeLBZGki2JJ3IY4US+M2xGwTpsymOB9on3RsiRy6MEWPgxViglhKHIpj+dEHkuKky3vaMfnXvbdMnjZMBX6ToZf1AfwC2M+QsBwBAAA=
+      SNOWMAN:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBhGf01MkPgYbkkGBmhZuDDFWEiHSst1dlyG0GGmNhRs4al8RFm6/HLOST4VQIWXYzcK8dV/NyfBFHj0anhdMWfdIGRpTY0tzcS41Jw1ZppVV0aNy6JEjamCukQX1g8ndn0GZWD3YezZVQWABwWekkKMDH7Z5COatajOfFFNnr3s6IjE3uOXlXdOpnLj2Z5c+Pbd3k3OP9caitQSOfZbeg7HUiZohw+CbQ96JeMfktKOyvBOeaWTueXEDW+Ex2YuY5xH3T1wQ4N+fpj7NOn2bqjnBtFpmmPCW5HzRAS8uwVROJO5MqkMZLDxnSZDb8t7+AMGL8HKGAEAAA==
+      SPIDER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PwW6CQBiE/zZpYkkfo1cSWBaBgwdTqy7RpSqguzeBVVkWahSq63P1AcuxhznMfDOHMQAMeNtUnVJfl+9DqcQAnkkB735WZJ5dWCb2EDaxnyEzcDA2hRdg38IIe4FvgNGPzuLSluL6CoNW3NvuIq4GADwN4CXdq07Ar9ChxXcnq9iFKtdk2Pt4Y6mIyLNHmlRnH2RI6p7Px8OFDv513Xa/dRVzwhNvVl1Wp9bCWSsxX9t5nfwwtLLp5LPXtGLbac1lcosmFepzTeNTyWdhxSdryeXxxh60ZPHxTmX+oHGuqRw70Sysebx0l49KU5TYFLE7aezgsBqN+gfwB8I+kI4cAQAA
+      SQUID:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OyW6DMBiE/1aqRFEfo1cks5jEx6pEjVFMWsJmbkCcsJg0SiCK+1R9xPrY08zom5HGBDDhZTfMUn5evg+dFAY80j282g72fFJ7VkVsYnm4ItYSL2rtGiGwU7tk6Zpg6tFZXKZOXJ/BmMR9mi/iagLAgwFPWSVnAb9ChagsWrQvQtko6uuc7JDc0v68oKdM1e/Up6Pm6zd/o8i/Lp6qHEvuhm15+prrMUMbN5ZiHdvNmN7K4OiyIHVYHw88X6ltkjpaUZQMdjQyj+Vhy/tsjD7KgfdhH/3ErWaO3tzLhCKWDIoFDPM8a5mz8nh/7A6FTfR7+AMzyQm5GAEAAA==
+      STRAY:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkm4t7PowkilQ8pgKUwLOy6DFGawoaDCc/mAsnRxFiff+RZHBpDh6diOnL/3n9WFMwnucQnPtmkWKM9KBVnrXDGNgimo1CtFQ6hcWzmz1VUhg7xIV9YPF3Z7BGlgP8PYs5sMAHcSPNCMjwx+2eSp6blWy7PHiwnbS4+OKg9wc13hjk75K7axWPjuxd5P6N/WGrKTxRPDq9PuMOaCqnsj5GwXaoWIv8hct6mbGETEGolomzq0Ie5bHbjb7ySiIpljkzjx5LukJc0S58NKZqz5esiDKLHSphR+44nAoXVw2k6pE+u401B12GyWB/AHgNO8nxwBAAA=
+      TROPICAL_FISH:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzU6DQBhFP01MkPgYbklg6GBZGmvpkM4g/WGAHVMGAYfaULDAM/mQsnR5c85Jrg6gw9P+q1fqo/0uKiU1uCc5PGeOJcTSkQbOXWwskOsYAuVLo7BElheZEBgvdNDn6CLbrpLXR9A6OXR9K686ANxp8BBlqpfwK0ffTOPSzGNfnUbizPuwN1VA6ssLOUejeCMOaWa+eXW2o/vPxV3GsUpsv0zPYS+ayNzaOyU3O+vUHH+Y924Hq1Qx7zgxTqyAh5jyqGJ1aDEvamidVgyRG6s/JzYlQ7pKK3pYN5SHiCJqsym8JTwZGFqXFCVVEVvu/Bz+AC+FBFwUAQAA
+      TURTLE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBhGf01MkPgYbkm4VxZdGDF0SKcI5VJmB8MghQEbCtbhmXxIWbo8+c6XHBlAhqdjN3P+MX7VZ84kuEcVPOumVet6aSo63VDFLByqvNh1oTiM2ia1TGbWhQzyerqwcTqz6yNIE/uZ5pFdZQC4k+AhLfjM4JcJXyWnRq1OPqcC2SvHR5UHqL1s0JCK8g3ZqF/33au9F84/15qKzOK54TdkCOeyT9W9EXG2izTaJ9/Ye1exm9xIXDV5dmgPbrIEMbrhNtcCj3T5gpcgizocfwriVhwvSJCW93m/ul6okbaz8jYxcNw0aNCcOtxu13L4A3wutJYUAQAA
+      VEX:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkkYRgosujDatEM6YCmXwo7LEJABGwptmefyAZ2lu/PlfGdxVAAVXo7dzPnX+FO3nCnwSCp4rW1clHWJNN1AWHtzTEuzbZtpFWZGnTMLGTpWQZWjMxunll2eQZnYfZpHdlEB4EGBpzjnM4Nftrh6dmr06uTyciEryeFR5z75PltkiJfig6xIL/vd+2q/OP9cc8oTk6fYbbLhMBd9rO9xwNkuQGUfXb0kwlTQWyqqzku8zt9ubmkYoTQhZhZ2iApy90IqmeI0iQTdZtz/lFlQnCUb6UQi7ePGM9yG9oHsspYMyKkP67V8AH9ATwanHAEAAA==
+      VILLAGER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OyW6DMBiE/1aqRFEfo1ckuzHbsSqpYhQ7TcJ+Y3ESqEkjAgnwVH3E+tjbzHwz0ugAOrzsvwcpv7qfQy2FBo+0glfTIYjktjByTCqDFMQxCtcujbIqXCd3BEbY0UFXo4vo+lpcn0HrxdgPnbjqAPCgwVOUy0HAr5h8lCUnVCW+LCdqKR/skdzQ5mLTczQVH9SireKrd2s9uf+6Zp/HpkwX/ik7b4eijdB6sZNitcNlG96491lvPHbPYoqYd5zSmMt0Ps689RuV4yzY3tNgObJGsZZiFixNNrORx6mpNOEem/lbSDLV5UGI1aY+JNhV7+EPoxK0ZBgBAAA=
+      VINDICATOR:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBhGf01MKvEx3JIwTKFlaWy1QzpgKYXO7LgMcpmpDYUGeCofUZYuT77zJUcD0ODl2PRSfrU/RSXFAh5JDq9YZAlK07XurBJHX2Jh6GtkZ7pjJVaRm8m6WAoNtPl0FW1XidszLDoxdH0rbhoAPCzgKUpkL+BXjK7Bz6WRn12ZjcSeOTwa0if1dUUu0Zi+E5uoed+92fvR+edaXRJbkmG35JdDn6rI2ONAil2AMnW6e5/M5Ios/fgwsIlNNHYbzzxhP+aSht+Iqe3AQobp5mTQOlJeTGdni7hiJq0ZovWHpFOD+CYoPcUwD0lVnJEz18MfaTekrhgBAAA=
+      WITCH:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkkGKNOwcKE2pkPKIBeBYcdlsAwztaGghefyAWXp8uR850uODqDDQ9xPUr4PX20nuQa3pIHHbetald1gw+EcGZuywkbZltywLIQr1zE3JbZ10NfRmQ9jxy/3oI38Ok4Dv+gAcKPBXVrKicMvnz1U5EfU5J6sZ4LXnMRIBkSct+SUztUrwUSt/f4ZH2b3H+uMZeZIZnvH4hROlUrRwY4k30dmrT6+ffEi/YT2fvKJ6BIptvSoyEKTZm+SifqHit6kopB0xzbUCm260J5l/pUqhthCVbCrZ18VIkjSrhBS+Wp1xJ7b5uhpfQB/vk7qxBwBAAA=
+      WITHER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBhGf01MkPgYbkkYKCBLY007pIBQrrPjMgjDTG1aaMo8lY8oS5dfzjnJpwKo8HIcZ86/Lj/dwKkCj7iFV4TcxnRQrdEK2drGaVytap1OM8zabN/cjWXolQrqGp3pZRro9RmUid6n+UKvKgA8KPCUVXym8EsXTydFr7eFx5sF2+tOjjoPMTs7+JQt9Qe2sVj5/t0+LO4/15qq3OKl6fXkFM21yPSDGXO6j1Ej0ltpxCKQMfclliSPdD+JZMBGI8hLVMrUJLtY+Oz7HuQR8qW/EJFaYcJ5wHpRCmyRLWGEZSzceWOw/ZRhXg5dgdz1PfwBYIvCGRgBAAA=
+      WITHER_SKELETON:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: WITHER_SKELETON_SKULL
+      WOLF:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2OzU6DQBhFP01MkPgYbkmmw0/DwoWxmkI6U6EIlN0AQ+kwUxsKhuGZfEhZurw55yTXBDDh6dCNUn72381ZcgPugxqeG+bWNl4hy+O2bznrilmsLh2L2SVuUON7Xu2bYC7RlffDmd8ewRj4NIw9v5kAcGfAQ8rkyOGX6xAVeYvqPJSVDrxlJwck94G4roNLqsu3wAvUwrev3k77/1x3YJkrj3bYFpdoLFWKdnYs+TZeVerrhwrZkSyaSfI+FxlBBH8IIjpMsrijiVREnCY6p+ooIpskJ4fOVFBFEN20XaFou99UmggyURxhqkO/ydHL8hz+AJP/nNsUAQAA
+      ZOMBIE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: ZOMBIE_HEAD
+      ZOMBIE_HORSE:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2PzU6DQBRGryYmSHwMtyQDBVoWXaiYdkgplg5Q7o6fQToM2LSgpc/lA8rS5ZdzzuJTAVR42jeDlB/nr+oouQL3tITnLHd4RoxCM6tS18yFY2kLq3C00shNMi+t0q4MFdQpOvFzf+SXR1B6fu2HM7+oAHCnwEOcyYHDLx89goealAdPFiO1p832RAZUnOa0i8f8jdq0nfj6xd6Mzj/X6rPEkunMq7HbDXkbk80slHwd6kUbfaNLx4BFPyi8xjfiFlfh0Wd1g+zTQFG3WxbX6S26BqtQICtuKN7HlKH0V6m5Fb6BbqT7yc7EhJLAfRWYxIJ2ulPtlsvpAfwBNvDkvRwBAAA=
+      ZOMBIE_VILLAGER:
+        ==: org.bukkit.inventory.ItemStack
+        v: 1519
+        type: PLAYER_HEAD
+        meta:
+          ==: ItemMeta
+          meta-type: SKULL
+          internal: H4sIAAAAAAAAAE2Oy06DQBiFf01MkPgYbkkGhqGwcNHYpJ1JAUu577hMW2CoDQUFnspHFHcuT853vhwZQIaXYzMI8dF9nirBJXikJbwitEJFZmWKbphY0blaKiYxVKVUSxPnqNQslcggL6Mb7/qK359B6vnYDx2/ywDwIMFTmImBww+fGErjCypjJoqJGkv2j0i4tL6t6DWc8ndq0Hbpd2tjP1n/WNJnEREJZpf0ehjyNkR77Am+89SiDb6SmlX23MxJG0zp1p5cv5jTzWFM/PPsbIPRjbzGaSm2Nao7dYLdDWuc+owSf00cLazSNiBu5Pw5vm2/QWnFrFOM3pb38Ats5JLKGAEAAA==
 
   essence_of_flight:
     enabled: true
     chance: 0.001
     item:
       ==: org.bukkit.inventory.ItemStack
+      v: 1519
       type: GHAST_TEAR
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
         display-name: §6Essence of Flight
         lore:
-        - §9Craft along with a Dragon Head for an Elytra!
+        - §3Trade in with Fragments of Amber, at the spawn museum!
         enchants:
           ARROW_KNOCKBACK: 10
-
-    # Mob type specific factor multiplied by the base EoF drop chance.
-    # If the mob is not listed, then the factor defaults to 0.0.
-    # Note, however, that spawner mobs don't do special drops.
     scale:
       BAT: 10.0
       BLAZE: 10.0
       CAVE_SPIDER: 1.0
       CREEPER: 2.0
-      ENDER_DRAGON: 50000.0
+      ENDER_DRAGON: 100000.0
       ENDERMAN: 1.0
       ENDERMITE: 3.0
       GHAST: 10.0
       GUARDIAN: 0.01
       HUSK: 0.5
       MAGMA_CUBE: 2.0
+      PHANTOM: 5.0
       PIG_ZOMBIE: 0.5
       SILVERFISH: 3.0
       SLIME: 0.5

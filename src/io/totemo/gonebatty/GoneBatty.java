@@ -2,6 +2,8 @@ package io.totemo.gonebatty;
 
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -79,9 +81,46 @@ public class GoneBatty extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase(getName())) {
-            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
+                return false;
+            } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 CONFIG.reload();
                 sender.sendMessage(ChatColor.GOLD + getName() + " configuration reloaded.");
+                return true;
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("set-head")) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("You must be in game to use this command.");
+                    return true;
+                }
+                Player player = (Player) sender;
+
+                String type = args[1].toUpperCase();
+                ItemStack head = player.getEquipment().getItemInMainHand();
+                if (head.getType() == Material.AIR) {
+                    CONFIG.HEAD_ITEMS.remove(type);
+                    sender.sendMessage(ChatColor.GOLD + "Head item for mob type " +
+                                       ChatColor.YELLOW + type + ChatColor.GOLD + " cleared.");
+                    CONFIG.save();
+                } else {
+                    if (HEAD_MATERIALS.contains(head.getType())) {
+                        ItemStack single = head.clone();
+                        single.setAmount(1);
+                        CONFIG.HEAD_ITEMS.put(type, single);
+                        sender.sendMessage(ChatColor.GOLD + "You set the head for mob type " +
+                                           ChatColor.YELLOW + type + ChatColor.GOLD + ".");
+                        CONFIG.save();
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "The item in your hand is not a head!");
+                    }
+                }
+                return true;
+            } else if (args.length == 1 && args[0].equalsIgnoreCase("list-heads")) {
+                TreeSet<String> mobTypes = new TreeSet<String>(CONFIG.HEAD_MOB_FACTOR.keySet());
+                mobTypes.addAll(CONFIG.HEAD_ITEMS.keySet());
+                mobTypes.addAll(CONFIG.EOF_MOB_FACTOR.keySet());
+                sender.sendMessage(ChatColor.GOLD + "Configured mob types: " +
+                                   mobTypes.stream().map(t -> (CONFIG.HEAD_ITEMS.get(t) == null ? ChatColor.RED : ChatColor.GREEN) + t)
+                                   .collect(Collectors.joining(ChatColor.GRAY + ", ")));
                 return true;
             }
         }
@@ -513,6 +552,19 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * (Long) by a player.
      */
     protected static final String PLAYER_DAMAGE_TIME_KEY = PLUGIN_NAME + "_PlayerDamageTime";
+
+    /**
+     * Valid head materials that can be used in the /gonebatty head command.
+     */
+    protected static TreeSet<Material> HEAD_MATERIALS = new TreeSet<Material>();
+    static {
+        HEAD_MATERIALS.add(Material.PLAYER_HEAD);
+        HEAD_MATERIALS.add(Material.CREEPER_HEAD);
+        HEAD_MATERIALS.add(Material.DRAGON_HEAD);
+        HEAD_MATERIALS.add(Material.ZOMBIE_HEAD);
+        HEAD_MATERIALS.add(Material.SKELETON_SKULL);
+        HEAD_MATERIALS.add(Material.WITHER_SKELETON_SKULL);
+    }
 
     /**
      * Time in ticks (1/20ths of a second) for which player attack damage

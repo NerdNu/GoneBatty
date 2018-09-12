@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -159,19 +158,9 @@ public class Configuration {
         }
 
         HEAD_ITEMS.clear();
-        HEAD_ITEMS.put("SKELETON", new ItemStack(Material.SKELETON_SKULL));
-        HEAD_ITEMS.put("WITHER_SKELETON", new ItemStack(Material.WITHER_SKELETON_SKULL));
-        HEAD_ITEMS.put("ZOMBIE", new ItemStack(Material.ZOMBIE_HEAD));
-        HEAD_ITEMS.put("CREEPER", new ItemStack(Material.CREEPER_HEAD));
-        HEAD_ITEMS.put("ENDER_DRAGON", new ItemStack(Material.DRAGON_HEAD));
-        ConfigurationSection headOwners = config.getConfigurationSection("drops.head.owner");
-        for (String mobType : headOwners.getKeys(false)) {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-            SkullMeta meta = (SkullMeta) head.getItemMeta();
-            @SuppressWarnings("deprecation")
-            OfflinePlayer owner = Bukkit.getOfflinePlayer(headOwners.getString(mobType));
-            meta.setOwningPlayer(owner);
-            head.setItemMeta(meta);
+        ConfigurationSection headItems = config.getConfigurationSection("drops.head.item");
+        for (String mobType : headItems.getKeys(false)) {
+            ItemStack head = headItems.getItemStack(mobType);
             HEAD_ITEMS.put(mobType, head);
         }
 
@@ -225,7 +214,9 @@ public class Configuration {
                 if (headItem != null) {
                     if (headItem.getType() == Material.PLAYER_HEAD) {
                         SkullMeta meta = (SkullMeta) headItem.getItemMeta();
-                        head = (meta.getOwningPlayer() != null) ? meta.getOwningPlayer().getName() : headItem.getType().name();
+                        OfflinePlayer owner = meta.getOwningPlayer();
+                        head = (owner != null && owner.getName() != null) ? owner.getName()
+                                                                          : headItem.getType().name();
                     } else {
                         head = headItem.getType().name();
                     }
@@ -246,6 +237,20 @@ public class Configuration {
             }
         }
     } // reload
+
+    // ------------------------------------------------------------------------
+    /**
+     * Save the configuration.
+     */
+    public void save() {
+        // Only the HEAD_ITEMS changed. Rest of the settings intact.
+        FileConfiguration config = GoneBatty.PLUGIN.getConfig();
+        ConfigurationSection headSection = config.createSection("drops.head.item");
+        for (Entry<String, ItemStack> entry : HEAD_ITEMS.entrySet()) {
+            headSection.set(entry.getKey(), entry.getValue());
+        }
+        GoneBatty.PLUGIN.saveConfig();
+    }
 
     // ------------------------------------------------------------------------
     /**

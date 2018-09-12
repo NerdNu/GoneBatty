@@ -1,7 +1,7 @@
 name: ${project.name}
 version: ${project.version}
 author: totemo
-authors: [totemo]
+authors: []
 description: ${project.description}
 website: ${project.url}
 main: io.totemo.gonebatty.GoneBatty
@@ -18,4 +18,8 @@ commands:
     description: ${project.name} administrative command.
     permission: gonebatty.admin
     usage: |
-      /<command> reload: Reload the configuration.
+    
+      §e/<command> help§f - Show usage help.
+      §e/<command> reload§f - Reload the configuration.
+      §e/<command> set-head <type>§f - Set the head for the specified mob type to the item in your hand. (Empty hand to clear.)
+      §e/<command> list-heads§f - List all the configured head types, colour coded green (item) or red (no configured item).

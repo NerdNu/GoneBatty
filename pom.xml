@@ -4,7 +4,7 @@
 	<groupId>io.totemo</groupId>
 	<name>GoneBatty</name>
 	<artifactId>${project.name}</artifactId>
-	<version>1.5.0</version>
+	<version>1.6.0</version>
 	<packaging>jar</packaging>
 	<description>PvE Rev 18 custom drops.</description>
 	<url>https://github.com/NerdNu/${project.name}</url>
@@ -66,8 +66,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.0.2</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>1.8</source>
+						<target>1.8</target>
 					</configuration>
 				</plugin>
 			</plugins>
