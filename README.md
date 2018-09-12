@@ -18,7 +18,7 @@ Configuration
 | `drops.head.enabled` | If true, head drops are enabled. |
 | `drops.head.chance` | The base head drop chance. |
 | `drops.head.scale.<id>` | The mob-type-specific head drop rate factor for the mob with type `<id>`. |
-|  `drops.head.owner.<id>` | The player name of the skull owner for the head dropped when the mob with identifier `<id>` is killed. |
+| `drops.head.item.<id>` | The serialised item stack of the head dropped when the mob with identifier `<id>` is killed. (This is set by `/gonebatty set-head <id>`.) |
 | `drops.essence_of_flight.enabled` | If true, Essence of Flight drops are enabled. |
 | `drops.essence_of_flight.chance` | The base Essence of Flight drop chance. |
 | `drops.essence_of_flight.item` | The serialised item stack of Essence of Flight. |
