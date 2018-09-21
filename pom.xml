@@ -4,7 +4,7 @@
 	<groupId>io.totemo</groupId>
 	<name>GoneBatty</name>
 	<artifactId>${project.name}</artifactId>
-	<version>1.6.0</version>
+	<version>1.6.1</version>
 	<packaging>jar</packaging>
 	<description>PvE Rev 18 custom drops.</description>
 	<url>https://github.com/NerdNu/${project.name}</url>

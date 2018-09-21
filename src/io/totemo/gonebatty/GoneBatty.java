@@ -1,5 +1,6 @@
 package io.totemo.gonebatty;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
@@ -22,6 +23,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -140,6 +142,11 @@ public class GoneBatty extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
         EntityMeta.api().set(event.getEntity(), this, "spawn-reason", event.getSpawnReason().name());
+        if (CONFIG.DEBUG_EVENTS) {
+            Entity entity = event.getEntity();
+            getLogger().info("onCreatureSpawn: " + entity.getType() + " " + Util.shortUuid(entity) +
+                             " " + event.getSpawnReason());
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -448,7 +455,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
     // ------------------------------------------------------------------------
     /**
-     * Return true if the specified entity type is eligible for custom drops.
+     * Return true if the specified entity is eligible for custom drops.
      *
      * @param entity the entity.
      * @return true if the specified entity is eligible for custom drops.
@@ -457,7 +464,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
         if (entity instanceof LivingEntity &&
             entity.getType() != EntityType.ARMOR_STAND) {
             String spawnReason = (String) EntityMeta.api().get(entity, this, "spawn-reason");
-            return spawnReason == null || !spawnReason.equals("SPAWNER");
+            return spawnReason == null || !NO_DECAPITATION_SPAWN_REASONS.contains(spawnReason);
         }
         return false;
     }
@@ -554,9 +561,19 @@ public class GoneBatty extends JavaPlugin implements Listener {
     protected static final String PLAYER_DAMAGE_TIME_KEY = PLUGIN_NAME + "_PlayerDamageTime";
 
     /**
+     * Set of SpawnReasons as Strings that deny a decapitation head drop.
+     */
+    protected static final HashSet<String> NO_DECAPITATION_SPAWN_REASONS = new HashSet<>();
+    static {
+        NO_DECAPITATION_SPAWN_REASONS.add(SpawnReason.SPAWNER.name());
+        NO_DECAPITATION_SPAWN_REASONS.add(SpawnReason.DROWNED.name());
+        NO_DECAPITATION_SPAWN_REASONS.add(SpawnReason.SLIME_SPLIT.name());
+    }
+
+    /**
      * Valid head materials that can be used in the /gonebatty head command.
      */
-    protected static TreeSet<Material> HEAD_MATERIALS = new TreeSet<Material>();
+    protected static HashSet<Material> HEAD_MATERIALS = new HashSet<>();
     static {
         HEAD_MATERIALS.add(Material.PLAYER_HEAD);
         HEAD_MATERIALS.add(Material.CREEPER_HEAD);
