@@ -239,7 +239,8 @@ public class GoneBatty extends JavaPlugin implements Listener {
                     if (player == null) {
                         return;
                     }
-                    int lootingLevel = player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
+                    int lootingLevel = Math.max(player.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS),
+                                                player.getEquipment().getItemInOffHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS));
                     doCustomDrops(event.getEntity(), lootingLevel);
                 }
             }
