@@ -21,6 +21,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -221,7 +222,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * Special drops are allowed in the end, even though the end grinder is
      * cheap, by scaling the drop chance per-world.
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
         if (canBeDecapitatedByPlayer(entity)) {
@@ -234,7 +235,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 Location loc = entity.getLocation();
                 if (loc.getWorld().getFullTime() - damageTime < PLAYER_DAMAGE_TICKS) {
                     // Calculate looting based on what the killing player is
-                    // holding in his main hand at the time the entity dies.
+                    // holding in his hands at the time the entity dies.
                     Player player = Bukkit.getPlayerExact(getPlayerNameMeta(entity));
                     if (player == null) {
                         return;
