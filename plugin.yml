@@ -21,5 +21,6 @@ commands:
     
       §e/<command> help§f - Show usage help.
       §e/<command> reload§f - Reload the configuration.
-      §e/<command> set-head <type>§f - Set the head for the specified mob type to the item in your hand. (Empty hand to clear.)
+      §e/<command> set-head <type>§f - Set the head for the specified mob type to the item in your hand. Use an empty hand to clear. Mob type constants are listed at https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html.
+      §e/<command> get-head <type>§f - Get the head for the specified mob type.
       §e/<command> list-heads§f - List all the configured head types, colour coded green (item) or red (no configured item).

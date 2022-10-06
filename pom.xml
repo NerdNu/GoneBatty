@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.totemo</groupId>
 	<name>GoneBatty</name>
-	<artifactId>${project.name}</artifactId>
-	<version>1.6.3</version>
+	<artifactId>GoneBatty</artifactId>
+	<version>1.7.0</version>
 	<packaging>jar</packaging>
 	<description>PvE Rev 18 custom drops.</description>
-	<url>https://github.com/NerdNu/${project.name}</url>
+	<url>https://github.com/NerdNu/GoneBatty</url>
 	<scm>
-		<connection>scm:git:git://github.com/NerdNu/${project.name}.git</connection>
-		<url>https://github.com/NerdNu/${project.name}</url>
-		<developerConnection>scm:git:git://github.com/NerdNu/${project.name}.git</developerConnection>
+		<connection>scm:git:git://github.com/NerdNu/GoneBatty.git</connection>
+		<url>https://github.com/NerdNu/GoneBatty</url>
+		<developerConnection>scm:git:git://github.com/NerdNu/GoneBatty.git</developerConnection>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

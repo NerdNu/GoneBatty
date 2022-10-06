@@ -70,7 +70,7 @@ public class Configuration {
     public boolean PLAYERS_DECAPITATE_PLAYERS;
 
     /**
-     * The per-world drop chance multiplier.
+     * Map from world name to the per-world drop chance multiplier.
      *
      * The multiplicative factor for world_the_end should be set very low to
      * account for the cheapness of the end grinder. If a world is not listed,
@@ -89,7 +89,8 @@ public class Configuration {
     public double HEAD_CHANCE;
 
     /**
-     * Scaling factor applied to the looting-adjusted head drop chance.
+     * Map from EntityType.name() to scaling factor applied to the
+     * looting-adjusted head drop chance.
      */
     public HashMap<String, Double> HEAD_MOB_FACTOR = new HashMap<String, Double>();
 
@@ -115,8 +116,9 @@ public class Configuration {
     public ItemStack ESSENCE_OF_FLIGHT;
 
     /**
-     * Scaling factor applied to the looting-adjusted essence of flight drop
-     * chance according to how flight-capable a mob is.
+     * Map from EntityType.name() to scaling factor applied to the
+     * looting-adjusted essence of flight drop chance according to how
+     * flight-capable a mob is.
      */
     public HashMap<String, Double> EOF_MOB_FACTOR = new HashMap<String, Double>();
 

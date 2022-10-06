@@ -1,10 +1,13 @@
 package io.totemo.gonebatty;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -83,52 +86,109 @@ public class GoneBatty extends JavaPlugin implements Listener {
      */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase(getName())) {
-            if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-                return false;
-            } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                CONFIG.reload();
-                sender.sendMessage(ChatColor.GOLD + getName() + " configuration reloaded.");
-                return true;
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("set-head")) {
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage("You must be in game to use this command.");
-                    return true;
-                }
-                Player player = (Player) sender;
-
-                String type = args[1].toUpperCase();
-                ItemStack head = player.getEquipment().getItemInMainHand();
-                if (head.getType() == Material.AIR) {
-                    CONFIG.HEAD_ITEMS.remove(type);
-                    sender.sendMessage(ChatColor.GOLD + "Head item for mob type " +
-                                       ChatColor.YELLOW + type + ChatColor.GOLD + " cleared.");
-                    CONFIG.save();
-                } else {
-                    if (HEAD_MATERIALS.contains(head.getType())) {
-                        ItemStack single = head.clone();
-                        single.setAmount(1);
-                        CONFIG.HEAD_ITEMS.put(type, single);
-                        sender.sendMessage(ChatColor.GOLD + "You set the head for mob type " +
-                                           ChatColor.YELLOW + type + ChatColor.GOLD + ".");
-                        CONFIG.save();
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "The item in your hand is not a head!");
-                    }
-                }
-                return true;
-            } else if (args.length == 1 && args[0].equalsIgnoreCase("list-heads")) {
-                TreeSet<String> mobTypes = new TreeSet<String>(CONFIG.HEAD_MOB_FACTOR.keySet());
-                mobTypes.addAll(CONFIG.HEAD_ITEMS.keySet());
-                mobTypes.addAll(CONFIG.EOF_MOB_FACTOR.keySet());
-                sender.sendMessage(ChatColor.GOLD + "Configured mob types: " +
-                                   mobTypes.stream().map(t -> (CONFIG.HEAD_ITEMS.get(t) == null ? ChatColor.RED : ChatColor.GREEN) + t)
-                                   .collect(Collectors.joining(ChatColor.GRAY + ", ")));
-                return true;
-            }
+        if (!command.getName().equalsIgnoreCase(getName())) {
+            return false;
         }
 
-        sender.sendMessage(ChatColor.RED + "Invalid command syntax.");
+        if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
+            return false;
+        }
+
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            CONFIG.reload();
+            sender.sendMessage(ChatColor.GOLD + getName() + " configuration reloaded.");
+            return true;
+        }
+
+        if (args.length >= 1 && args[0].equalsIgnoreCase("set-head")) {
+            if (args.length != 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /gonebatty set-head <type>");
+                return true;
+            }
+
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("You must be in game to use this command.");
+                return true;
+            }
+            Player player = (Player) sender;
+
+            String type = args[1].toUpperCase();
+            if (!validateMobType(sender, type)) {
+                return true;
+            }
+
+            ItemStack head = player.getEquipment().getItemInMainHand();
+            if (head.getType() == Material.AIR) {
+                CONFIG.HEAD_ITEMS.remove(type);
+                sender.sendMessage(ChatColor.GOLD + "Head item for mob type " +
+                                   ChatColor.YELLOW + type + ChatColor.GOLD + " cleared.");
+                CONFIG.save();
+            } else {
+                if (HEAD_MATERIALS.contains(head.getType())) {
+                    ItemStack single = head.clone();
+                    single.setAmount(1);
+                    CONFIG.HEAD_ITEMS.put(type, single);
+                    sender.sendMessage(ChatColor.GOLD + "You set the head for mob type " +
+                                       ChatColor.YELLOW + type + ChatColor.GOLD + ".");
+                    CONFIG.save();
+                } else {
+                    sender.sendMessage(ChatColor.RED + "The item in your hand is not a head!");
+                }
+            }
+            return true;
+        }
+
+        if (args.length >= 1 && args[0].equalsIgnoreCase("get-head")) {
+            if (args.length != 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /gonebatty get-head <type>");
+                return true;
+            }
+
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("You must be in game to use this command.");
+                return true;
+            }
+            Player player = (Player) sender;
+
+            String type = args[1].toUpperCase();
+            if (!validateMobType(sender, type)) {
+                return true;
+            }
+
+            // If the item doesn't fit in the player's inventory, drop it.
+            ItemStack item = CONFIG.HEAD_ITEMS.get(type);
+            if (item == null) {
+                sender.sendMessage(ChatColor.RED + "Type " + type + " does not have a head drop configured.");
+                return true;
+            } else {
+                Location loc = player.getLocation();
+                HashMap<Integer, ItemStack> didntFit = player.getInventory().addItem(item.clone());
+                for (ItemStack drop : didntFit.values()) {
+                    loc.getWorld().dropItemNaturally(loc, drop);
+                }
+                if (didntFit.size() == 0) {
+                    sender.sendMessage(ChatColor.YELLOW + type + ChatColor.GOLD + " head given!");
+                } else {
+                    sender.sendMessage(ChatColor.YELLOW + type + ChatColor.GOLD + " dropped near you! (Your inventory is full.)");
+                }
+            }
+            return true;
+        }
+
+        if (args.length == 1 && args[0].equalsIgnoreCase("list-heads")) {
+            TreeSet<String> mobTypes = new TreeSet<String>(
+                Stream.of(EntityType.values())
+                    .filter(t -> t != EntityType.ARMOR_STAND && t.isAlive())
+                    .map(Object::toString)
+                    .toList());
+            sender.sendMessage(ChatColor.GOLD + "Configurable mob types: " +
+                               mobTypes.stream()
+                                   .map(t -> (CONFIG.HEAD_ITEMS.get(t) == null ? ChatColor.RED : ChatColor.GREEN) + t)
+                                   .collect(Collectors.joining(ChatColor.GRAY + ", ")));
+            return true;
+        }
+
+        sender.sendMessage(ChatColor.RED + "Invalid command syntax. Try \"/gonebatty help\" for help.");
         return true;
     }
 
@@ -155,8 +215,15 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * Tag mobs hurt by players.
      *
      * Only those mobs hurt recently by players will have special drops.
+     *
+     * Note that {@link #onEntityExplode(EntityExplodeEvent)} is called AFTER
+     * the {@link #onEntityDeath(EntityDeathEvent)} event of the mobs dying in
+     * the explosion. onEntityExplode() is where we drop the custom heads,
+     * whereas in onEntityDeath() we simply replace vanilla head drops with
+     * corresponding custom ones. Need to be careful about vanilla mobs wearing
+     * vanilla heads.
      */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity victim = event.getEntity();
         if (!(victim instanceof LivingEntity)) {
@@ -178,7 +245,11 @@ public class GoneBatty extends JavaPlugin implements Listener {
             Creeper creeper = (Creeper) damager;
             if (finalHealth <= 0 && creeper.isPowered() && canBeDecapitatedByChargedCreeper(victim)) {
                 ChargedCreeperExplosion meta = getChargedCreeperExplosion(creeper, true);
+
                 if (canDropVanillaHead(victim)) {
+                    // Tag the vanilla mob with this meta so we can replace
+                    // the vanilla head drop with the corresponding custom head.
+                    victim.setMetadata(CHARGED_CREEPER_KEY, meta);
                     if (CONFIG.DEBUG_EVENTS) {
                         getLogger().info("Vanilla decapitation expected.");
                     }
@@ -191,7 +262,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
                 }
             }
         } else {
-            if (canBeDecapitatedByPlayer(victim)) {
+            if (canBeDecapitated(victim)) {
                 String playerName = "";
                 boolean isPlayerAttack = false;
                 if (event.getDamager() instanceof Player) {
@@ -225,11 +296,22 @@ public class GoneBatty extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onEntityDeath(EntityDeathEvent event) {
         Entity entity = event.getEntity();
-        if (canBeDecapitatedByPlayer(entity)) {
+        if (canBeDecapitated(entity)) {
             if (CONFIG.DEBUG_EVENTS) {
                 getLogger().info("onEntityDeath: " + entity.getType() + " " + Util.shortUuid(entity));
             }
 
+            // Replace vanilla head drops when a charged creeper blows up a mob.
+            if (replaceVanillaHeadDrop(entity, event.getDrops())) {
+                // The mob dropped a vanilla head due to a charged creeper
+                // explosion, so therefore don't do player-caused decapitation,
+                // because you might end up with more than one dropped head.
+                return;
+            }
+
+            // The code that follows calculates drops when the player caused
+            // the mob death. It is not run when the mob died due to charged
+            // creeper explosion.
             Long damageTime = getPlayerDamageTime(entity);
             if (damageTime != null) {
                 Location loc = entity.getLocation();
@@ -252,8 +334,16 @@ public class GoneBatty extends JavaPlugin implements Listener {
     /**
      * Handle charged creeper explosions by dropping the head of the first
      * victim to die (in a previous EntityDamageByEntityEvent).
-     * 
+     *
      * The custom head drop is prevented by a prior vanilla head drop.
+     *
+     * Testing in 1.13 reveals that a head only drops if it was an instakill
+     * from the explosion; death from fall damage triggered by the charged
+     * creeper explosion throwing the mob off a ledge does not produce a head
+     * drop.
+     *
+     * Also, deaths from mobs that do not have a vanilla head drop do not
+     * prevent the vanilla head drop.
      */
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
@@ -285,6 +375,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
                             droppedHead = CONFIG.HEAD_ITEMS.get(victimName);
                         }
                     }
+
                     if (droppedHead != null) {
                         Location loc = meta.firstVictim.getLocation();
                         loc.getWorld().dropItem(loc, droppedHead);
@@ -297,6 +388,82 @@ public class GoneBatty extends JavaPlugin implements Listener {
             }
         }
     } // onEntityExplode
+
+    // ------------------------------------------------------------------------
+    /**
+     * Look at the drops of a mob killed by a charged creeper explosion, and if
+     * a vanilla mob head was dropped, replace that with the corresponding
+     * GoneBatty-custom head.
+     *
+     * For example, if a charged creeper explodes, killing a skeleton, Mojang's
+     * vanilla code would add a skeleton skull to the skeleton's death drops.
+     * This function would replace that with the configured head drop for
+     * SKELETON, which probably is still a SKELETON_SKULL, but perhaps has a
+     * custom name or lore.
+     *
+     * Complicating matters is that if the aforementioned SKELETON was wearing a
+     * skeleton skull, then that skull should be dropped "as is" without being
+     * replaced by the custom item. Testing this scenario in 1.19.2, it seems
+     * that creeper explosions don't cause armour slot items to drop unless the
+     * item was picked up (even when the armour drop chances are set to 100%).
+     * Testing using a wither skeleton that has picked up and is wearing a
+     * wither skeleton skull, it is apparent that two item stacks of one wither
+     * skull each get added to the drops list by vanilla code. However, the code
+     * deals with the possibility that two vanilla head drops have been stacked
+     * together as one item stack.
+     *
+     * @param entity the mob that just died.
+     * @param drops  the drops from the EntityDeathEvent.
+     * @return true if a vanilla head drop was replaced with a custom head;
+     *         otherwise false.
+     */
+    protected boolean replaceVanillaHeadDrop(Entity mob, List<ItemStack> drops) {
+        // Did the mob die due to charged creeper explosion.
+        if (!mob.hasMetadata(CHARGED_CREEPER_KEY)) {
+            return false;
+        }
+
+        // Does the mob have a replaceable head?
+        final Material vanillaHeadMaterial = VANILLA_HEAD_MATERIALS.get(mob.getType());
+        if (vanillaHeadMaterial == null) {
+            return false;
+        }
+
+        // Is there a configured custom head for this mob?
+        final ItemStack replacementHead = CONFIG.HEAD_ITEMS.get(mob.getType().name());
+        if (replacementHead == null) {
+            return false;
+        }
+
+        // Remove one vanilla head from the drops so it can be replaced.
+        final ItemStack vanillaHead = new ItemStack(vanillaHeadMaterial);
+        ItemStack replacedDrop = null;
+        Iterator<ItemStack> dropsIt = drops.iterator();
+        while (dropsIt.hasNext()) {
+            ItemStack drop = dropsIt.next();
+            if (drop.isSimilar(vanillaHead)) {
+                dropsIt.remove();
+                replacedDrop = drop;
+                break;
+            }
+        }
+
+        // Did the drops include a head that can be replaced?
+        if (replacedDrop == null) {
+            return false;
+        }
+
+        // Is there more than one item in the replaced drop stack?
+        if (replacedDrop.getAmount() > 1) {
+            // Remove one item from that stack and re-add the rest to drops.
+            replacedDrop.setAmount(replacedDrop.getAmount() - 1);
+            drops.add(replacedDrop);
+        }
+
+        // Add the replaced head to the drops.
+        drops.add(replacementHead.clone());
+        return true;
+    } // replaceVanillaHeadDrop
 
     // ------------------------------------------------------------------------
     /**
@@ -351,7 +518,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
     /**
      * Do custom drops.
      *
-     * @param entity the dropping entity (mob).
+     * @param entity       the dropping entity (mob).
      * @param lootingLevel the level of looting on the weapon ([0,3]).
      */
     protected void doCustomDrops(Entity entity, int lootingLevel) {
@@ -417,30 +584,46 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
     // ------------------------------------------------------------------------
     /**
+     * Check that the specified entity type, as an upper-cased string, can be
+     * configured to drop heads.
+     *
+     * @param sender the command sender, sent error messages.
+     * @param type   the EntityType as a String; must be upper-cased by the
+     *               caller.
+     * @return true if the specified EntityType can drop heads, otherwise false.
+     */
+    protected boolean validateMobType(CommandSender sender, String type) {
+        EntityType entityType = null;
+        try {
+            entityType = EntityType.valueOf(type);
+            if (entityType.isAlive() && entityType != EntityType.ARMOR_STAND) {
+                return true;
+            } else {
+                sender.sendMessage(ChatColor.RED + entityType.toString() + " can't drop heads!");
+            }
+        } catch (IllegalArgumentException ex) {
+            sender.sendMessage(ChatColor.RED + type + " is not a valid mob type!");
+        }
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+    /**
      * Returns true if the specified entity can drop its head when killed by a
      * charged creeper in vanilla Minecraft.
-     * 
+     *
      * @returns true if the specified entity can drop its head when killed by a
      *          charged creeper in vanilla Minecraft.
      */
     protected boolean canDropVanillaHead(Entity entity) {
-        switch (entity.getType()) {
-        case SKELETON:
-        case WITHER_SKELETON:
-        case CREEPER:
-        case ZOMBIE:
-            // Not players or ender dragons in vanilla.
-            return true;
-        default:
-            return false;
-        }
+        return VANILLA_HEAD_MATERIALS.containsKey(entity.getType());
     }
 
     // ------------------------------------------------------------------------
     /**
      * Return true if the specified entity can be decapitated by a charged
      * creeper.
-     * 
+     *
      * @param entity the entity.
      * @return true if the specified entity can be decapitated by a charged
      *         creeper.
@@ -462,7 +645,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
      * @param entity the entity.
      * @return true if the specified entity is eligible for custom drops.
      */
-    protected boolean canBeDecapitatedByPlayer(Entity entity) {
+    protected boolean canBeDecapitated(Entity entity) {
         if (entity instanceof LivingEntity &&
             entity.getType() != EntityType.ARMOR_STAND) {
             String spawnReason = (String) EntityMeta.api().get(entity, this, "spawn-reason");
@@ -473,12 +656,12 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
     // ------------------------------------------------------------------------
     /**
-     * Return the ChargedCreeperExplosion metadata instances associated with a
+     * Return the ChargedCreeperExplosion metadata instance associated with a
      * charged creeper, creating and attaching it as necessary.
-     * 
+     *
      * @param creeper the charged creeper.
-     * @param create if true, create and attach the metadata if necessary;
-     *        otherwise, return null if not present.
+     * @param create  if true, create and attach the metadata if necessary;
+     *                otherwise, return null if not present.
      * @return a ChargedCreeperExplosion reference; can be null if create is
      *         false.
      */
@@ -504,7 +687,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
     private static final class ChargedCreeperExplosion extends FixedMetadataValue {
         /**
          * Constructor.
-         * 
+         *
          * @param owningPlugin the owning plugin.
          */
         public ChargedCreeperExplosion(Plugin owningPlugin) {
@@ -513,7 +696,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
         /**
          * Convert to String for debugging.
-         * 
+         *
          * @return the String form of this object.
          */
         @Override
@@ -530,8 +713,8 @@ public class GoneBatty extends JavaPlugin implements Listener {
 
         /**
          * A reference to the first mob (or player) killed by a charged creeper
-         * explosion. If there was no vanilla head drop, then this entity will
-         * frop its head.
+         * explosion in the event of a non-vanilla decapitation. Unused for
+         * vanilla decapitations.
          */
         Entity firstVictim;
     }
@@ -583,6 +766,18 @@ public class GoneBatty extends JavaPlugin implements Listener {
         HEAD_MATERIALS.add(Material.ZOMBIE_HEAD);
         HEAD_MATERIALS.add(Material.SKELETON_SKULL);
         HEAD_MATERIALS.add(Material.WITHER_SKELETON_SKULL);
+    }
+
+    /**
+     * Map from mob EntityType to the Material of the head it drops in a charged
+     * creeper explosion due to vanilla Minecraft code only.
+     */
+    protected static HashMap<EntityType, Material> VANILLA_HEAD_MATERIALS = new HashMap<>();
+    static {
+        VANILLA_HEAD_MATERIALS.put(EntityType.CREEPER, Material.CREEPER_HEAD);
+        VANILLA_HEAD_MATERIALS.put(EntityType.SKELETON, Material.SKELETON_SKULL);
+        VANILLA_HEAD_MATERIALS.put(EntityType.WITHER_SKELETON, Material.WITHER_SKELETON_SKULL);
+        VANILLA_HEAD_MATERIALS.put(EntityType.ZOMBIE, Material.ZOMBIE_HEAD);
     }
 
     /**

@@ -2,6 +2,17 @@ GoneBatty
 =========
 PvE Rev 18 custom drops (mob heads and "Essence of Flight").
 
+
+Commands
+--------
+
+ * `/gonebatty reload` - Reload the configuration.
+ * `/gonebatty set-head <type>` - Set the head of the mob with the specified entity type, which is one of the constants listed [here](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html). Use an empty hand to clear the specified entry.
+ * `/gonebatty get-head <type>` - Get the head for the specified mob type.
+ * `/gonebatty list-heads` - List all the head types, colour coded green (item configured) or red (no configured item).
+
+
+
 Configuration
 -------------
 
@@ -17,29 +28,23 @@ Configuration
 | `world.factor.<worldname>` | The per-world scaling factor for the drop rate. |
 | `drops.head.enabled` | If true, head drops are enabled. |
 | `drops.head.chance` | The base head drop chance. |
-| `drops.head.scale.<id>` | The mob-type-specific head drop rate factor for the mob with type `<id>`. |
-| `drops.head.item.<id>` | The serialised item stack of the head dropped when the mob with identifier `<id>` is killed. (This is set by `/gonebatty set-head <id>`.) |
+| `drops.head.scale.<type>` | The mob-type-specific head drop rate factor for the mob with type `<type>`. |
+| `drops.head.item.<type>` | The serialised item stack of the head dropped when the mob with identifier `<type>` is killed. (This is set by `/gonebatty set-head <type>`.) |
 | `drops.essence_of_flight.enabled` | If true, Essence of Flight drops are enabled. |
 | `drops.essence_of_flight.chance` | The base Essence of Flight drop chance. |
 | `drops.essence_of_flight.item` | The serialised item stack of Essence of Flight. |
-| `drops.essence_of_flight.scale.<id>` | The mob-type-specific Essence of Flight drop rate factor for the mob with type `<id>`. |
+| `drops.essence_of_flight.scale.<type>` | The mob-type-specific Essence of Flight drop rate factor for the mob with type `<type>`. |
 
 Notes:
 
- * Mob type identifiers are generally EntityType.name() (uppercase), e.g. CREEPER, WITHER_SKELETON, PLAYER.
+ * Mob type identifiers are upper cased [EntityType](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html) constants, e.g. `CREEPER`, `WITHER_SKELETON`, `PLAYER`.
  * The probability of a particular drop is computed as the product of the base probability, the world factor for the world where the mob dies, the mob-type scale factor for the mob that died and the looting level adjustment for the weapon used.
-
-
-Commands
---------
-
- * `/gonebatty reload` - Reload the configuration.
 
 
 Permissions
 -----------
 
- * `gonebatty.admin` - Permission to run `/gonebatty reload`.
+ * `gonebatty.admin` - Permission to run `/gonebatty` commands.
 
 
 Dependencies
