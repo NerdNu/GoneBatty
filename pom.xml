@@ -4,7 +4,7 @@
 	<groupId>io.totemo</groupId>
 	<name>GoneBatty</name>
 	<artifactId>GoneBatty</artifactId>
-	<version>1.7.0</version>
+	<version>1.7.1</version>
 	<packaging>jar</packaging>
 	<description>PvE Rev 18 custom drops.</description>
 	<url>https://github.com/NerdNu/GoneBatty</url>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.13-R0.1-SNAPSHOT</version>
+			<version>1.20-R0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nu.nerd</groupId>

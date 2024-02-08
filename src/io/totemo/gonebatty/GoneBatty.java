@@ -766,6 +766,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
         HEAD_MATERIALS.add(Material.ZOMBIE_HEAD);
         HEAD_MATERIALS.add(Material.SKELETON_SKULL);
         HEAD_MATERIALS.add(Material.WITHER_SKELETON_SKULL);
+        HEAD_MATERIALS.add(Material.PIGLIN_HEAD);
     }
 
     /**
@@ -778,6 +779,7 @@ public class GoneBatty extends JavaPlugin implements Listener {
         VANILLA_HEAD_MATERIALS.put(EntityType.SKELETON, Material.SKELETON_SKULL);
         VANILLA_HEAD_MATERIALS.put(EntityType.WITHER_SKELETON, Material.WITHER_SKELETON_SKULL);
         VANILLA_HEAD_MATERIALS.put(EntityType.ZOMBIE, Material.ZOMBIE_HEAD);
+        VANILLA_HEAD_MATERIALS.put(EntityType.PIGLIN, Material.PIGLIN_HEAD);
     }
 
     /**
